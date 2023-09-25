@@ -32,6 +32,7 @@ public class HashCacheTest {
     }
 
     @Test
+    @DisplayName("findUrlByKeyTest")
     void    findUrlByKeyTest() {
         //  given
         String  key = "key";
