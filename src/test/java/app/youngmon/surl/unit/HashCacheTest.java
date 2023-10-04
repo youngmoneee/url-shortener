@@ -1,6 +1,6 @@
-package app.youngmon.surl.unit.hash;
+package app.youngmon.surl.unit;
 
-import app.youngmon.surl.HashCache;
+import app.youngmon.surl.interfaces.HashCache;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
