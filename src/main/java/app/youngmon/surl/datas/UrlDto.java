@@ -1,4 +1,4 @@
-package app.youngmon.surl;
+package app.youngmon.surl.datas;
 
 import lombok.Data;
 

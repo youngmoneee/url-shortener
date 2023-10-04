@@ -1,4 +1,4 @@
-package app.youngmon.surl;
+package app.youngmon.surl.datas;
 
 import jakarta.persistence.*;
 import lombok.Data;
