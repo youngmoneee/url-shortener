@@ -1,6 +1,7 @@
-package app.youngmon.surl.unit.hash;
+package app.youngmon.surl.unit;
 
-import app.youngmon.surl.HashService;
+import app.youngmon.surl.HashRepository;
+import app.youngmon.surl.interfaces.HashService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,19 +16,21 @@ import static org.mockito.Mockito.*;
 public class HashServiceTest {
     @Mock
     HashService mockHashService;
+    @Mock
+    HashRepository mockHashRepository;
 
     @Test
     @DisplayName("getHashBase Test")
     void getHashBaseTest() {
         //  given
         String  hashBase = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        when(mockHashService.getHashBase()).thenReturn(hashBase);
+        when(mockHashService.getHashBaseArr()).thenReturn(hashBase.toCharArray());
 
         //  when
-        String  res = mockHashService.getHashBase();
+        char[]  res = mockHashService.getHashBaseArr();
 
         //  then
-        assertThat(res).isEqualTo(hashBase);
+        assertThat(res).isEqualTo(hashBase.toCharArray());
     }
 
     @Test
@@ -48,14 +51,16 @@ public class HashServiceTest {
     @DisplayName("encode Test")
     void encodeTest() {
         //  given
-        int id = 1;
+        String  url = "http://www.google.com";
         String  hashBase = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String  expectedCode = "1";
+
+        when(mockHashRepository.createUrl(url)).thenReturn(1L);
+        Long    id = mockHashRepository.createUrl(url);
 
         when(mockHashService.encode(id)).thenReturn("" + hashBase.charAt(id % hashBase.length()));
 
         //  when
-        String  res = mockHashService.encode(id);
 
         //  then
         assertThat(res).isEqualTo(expectedCode);
@@ -67,12 +72,12 @@ public class HashServiceTest {
         //  given
         String  code = "1";
         String  hashBase = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        int     expectedId = 1;
+        Long    expectedId = 1L;
 
-        when(mockHashService.decode(code)).thenReturn(hashBase.indexOf(code));
+        when(mockHashService.decode(code)).thenReturn((long) hashBase.indexOf(code));
 
         //  when
-        int res = mockHashService.decode(code);
+        Long res = mockHashService.decode(code);
 
         //  then
         assertThat(res).isEqualTo(expectedId);
