@@ -13,11 +13,11 @@ import java.util.Optional;
 @Slf4j
 public class HashServiceImpl implements HashService {
     private final
-    HashJpaRepository hashRepository;
+    HashJpaRepository   hashRepository;
     private final
     String              hashBase;
     private final
-    HashCache hashCache;
+    HashCache           hashCache;
 
 
     @Autowired
