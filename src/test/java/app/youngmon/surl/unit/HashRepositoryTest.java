@@ -58,7 +58,7 @@ public class HashRepositoryTest {
         Optional<UrlEntity> res = mockHashRepository.findUrlEntityByLongUrl(longUrl);
 
         //  then
-        assertThat(res.map(UrlEntity::getLongUrl)).isEqualTo(expectedEntity.getLongUrl());
+        assertThat(res.map(UrlEntity::getLongUrl)).isEqualTo(Optional.of(expectedEntity.getLongUrl()));
     }
 
     @Test
@@ -75,6 +75,6 @@ public class HashRepositoryTest {
         Optional<UrlEntity>  res = mockHashRepository.findById(id);
 
         //  then
-        assertThat(res.map(UrlEntity::getId)).isEqualTo(id);
+        assertThat(res.map(UrlEntity::getId)).isEqualTo(Optional.of(id));
     }
 }
