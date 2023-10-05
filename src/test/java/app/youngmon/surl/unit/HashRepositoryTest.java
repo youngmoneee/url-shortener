@@ -1,6 +1,7 @@
 package app.youngmon.surl.unit;
 
-import app.youngmon.surl.HashRepository;
+import app.youngmon.surl.datas.UrlEntity;
+import app.youngmon.surl.interfaces.HashJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,42 +17,64 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("HashRepository Test")
 public class HashRepositoryTest {
     @Mock
-    HashRepository mockHashRepository;
+    HashJpaRepository mockHashRepository;
 
     @Test
     @DisplayName("createUrl not exist Test")
-    void createUrlTest() {
+    void saveTest() {
         //  given
-        String  url = "url";
-        Long    expectedId = 1L;
-        when(mockHashRepository.createUrl(url)).thenReturn(expectedId);
+        String  longUrl = "url";
+        String  shortUrl = "sUrl";
+        Long    id = 1L;
+        UrlEntity savedUrl = new UrlEntity();
+
+        savedUrl.setLongUrl(longUrl);
+        savedUrl.setShortUrl(shortUrl);
+        savedUrl.setId(id);
+
+        when(mockHashRepository.save(savedUrl)).thenReturn(savedUrl);
 
         //  when
-        Long     res = mockHashRepository.createUrl(url);
+        UrlEntity   res = mockHashRepository.save(savedUrl);
 
         //  then
-        assertThat(res).isEqualTo(expectedId);
+        assertThat(res).isEqualTo(savedUrl);
     }
 
     @Test
-    @DisplayName("createUrl exist Test")
-    void createUrlExistTest() {
-        String  url = "url";
-        when(mockHashRepository.)
+    @DisplayName("findByUrl exist Test")
+    void findByUrlExistTest() {
+        //  given
+        String      longUrl = "long";
+        UrlEntity   expectedEntity = new UrlEntity();
+
+        expectedEntity.setId(1L);
+        expectedEntity.setLongUrl("long");
+        expectedEntity.setShortUrl("1");
+
+        when(mockHashRepository.findUrlEntityByLongUrl(longUrl)).thenReturn(Optional.of(new UrlEntity(longUrl)));
+
+        //  when
+        Optional<UrlEntity> res = mockHashRepository.findUrlEntityByLongUrl(longUrl);
+
+        //  then
+        assertThat(res.map(UrlEntity::getLongUrl)).isEqualTo(expectedEntity.getLongUrl());
     }
 
     @Test
-    @DisplayName("findUrlById Test")
-    void findUrlByIdTest() {
+    @DisplayName("findById Test")
+    void findByIdTest() {
         //  given
         Long    id = 1L;
-        String  expectedUrl = "url";
-        when(mockHashRepository.findUrlById(id)).thenReturn(Optional.ofNullable(expectedUrl));
+        UrlEntity   expectedEntity = new UrlEntity();
+        expectedEntity.setId(id);
+
+        when(mockHashRepository.findById(id)).thenReturn(Optional.of(expectedEntity));
 
         //  when
-        Optional<String>  res = mockHashRepository.findUrlById(id);
+        Optional<UrlEntity>  res = mockHashRepository.findById(id);
 
         //  then
-        assertThat(res).isEqualTo(expectedUrl);
+        assertThat(res.map(UrlEntity::getId)).isEqualTo(id);
     }
 }
