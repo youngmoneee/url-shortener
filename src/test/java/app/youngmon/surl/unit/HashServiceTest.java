@@ -1,6 +1,5 @@
 package app.youngmon.surl.unit;
 
-import app.youngmon.surl.HashRepository;
 import app.youngmon.surl.interfaces.HashService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,71 +14,67 @@ import static org.mockito.Mockito.*;
 @DisplayName("HashService Test")
 public class HashServiceTest {
     @Mock
-    HashService mockHashService;
-    @Mock
-    HashRepository mockHashRepository;
+    HashService service;
+
+    final String hashBase = "1234";
 
     @Test
-    @DisplayName("getHashBase Test")
+    @DisplayName("Get HashBase Test")
     void getHashBaseTest() {
         //  given
-        String  hashBase = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        when(mockHashService.getHashBaseArr()).thenReturn(hashBase.toCharArray());
+        char[] expectedHashBase = {'1', '2', '3', '4'};
+        when(service.getHashBaseArr()).thenReturn(hashBase.toCharArray());
 
         //  when
-        char[]  res = mockHashService.getHashBaseArr();
+        char[] res = service.getHashBaseArr();
 
         //  then
-        assertThat(res).isEqualTo(hashBase.toCharArray());
+        assertThat(res).isEqualTo(expectedHashBase);
     }
 
     @Test
-    @DisplayName("getHashBaseLength Test")
-    void getHashBaseLengthTest() {
+    @DisplayName("Get HaseBase Length Test")
+    void getHashBeseLengthTest() {
         //  given
-        String  hashBase = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        when(mockHashService.getHashBaseLength()).thenReturn(hashBase.length());
+        int expectedLen = hashBase.length();
+        when(service.getHashBaseLength()).thenReturn(hashBase.length());
 
         //  when
-        int     res = mockHashService.getHashBaseLength();
+        int res = service.getHashBaseLength();
 
         //  then
-        assertThat(res).isEqualTo(hashBase.length());
+        assertThat(res).isEqualTo(expectedLen);
     }
 
     @Test
-    @DisplayName("encode Test")
-    void encodeTest() {
+    @DisplayName("Get Short Url Test")
+    void getShortUrlTest() {
         //  given
-        String  url = "http://www.google.com";
-        String  hashBase = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String  expectedCode = "1";
+        String  longUrl = "longUrl";
+        String  expectedUrl = "shortUrl";
 
-        when(mockHashRepository.createUrl(url)).thenReturn(1L);
-        Long    id = mockHashRepository.createUrl(url);
-
-        when(mockHashService.encode(id)).thenReturn("" + hashBase.charAt(id % hashBase.length()));
+        when(service.getShortUrl(longUrl)).thenReturn("shortUrl");
 
         //  when
+        String  res = service.getShortUrl(longUrl);
 
         //  then
-        assertThat(res).isEqualTo(expectedCode);
+        assertThat(res).isEqualTo(expectedUrl);
     }
 
     @Test
-    @DisplayName("decode Test")
-    void decodeTest() {
+    @DisplayName("Get Long Url Test")
+    void getLongUrlTest() {
         //  given
-        String  code = "1";
-        String  hashBase = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        Long    expectedId = 1L;
+        String  shortUrl = "shortUrl";
+        String  expectedUrl = "longUrl";
 
-        when(mockHashService.decode(code)).thenReturn((long) hashBase.indexOf(code));
+        when(service.getLongUrl(shortUrl)).thenReturn("longUrl");
 
         //  when
-        Long res = mockHashService.decode(code);
+        String  res = service.getLongUrl(shortUrl);
 
         //  then
-        assertThat(res).isEqualTo(expectedId);
+        assertThat(res).isEqualTo(expectedUrl);
     }
 }
