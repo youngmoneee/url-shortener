@@ -12,14 +12,17 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    
-    - name: Set up Cloud CLI
-      uses: google-github-actions/setup-gcloud@v1
 
     - name: Auth With GCP
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
+    
+    - name: Set up Cloud CLI
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Code Build
+      run: ./gradlew build --exclude-task test
     
     - name: Build and Push Docker image
       run: | 
