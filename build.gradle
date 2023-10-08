@@ -7,7 +7,7 @@ plugins {
 	id 'java-library'
 }
 
-group = 'app.youngmon'
+group = 'io.ymon'
 version = '0.0.1'
 
 java {
