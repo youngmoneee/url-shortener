@@ -7,6 +7,10 @@ plugins {
 	id 'java-library'
 }
 
+jar {
+	enabled = false
+}
+
 group = 'io.ymon'
 version = '0.0.1'
 
