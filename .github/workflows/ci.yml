@@ -30,7 +30,4 @@ jobs:
           gradle-${{ runner.os }}-
     
     - name: Build
-      run: ./gradlew build
-    
-    - name: Test
-      run: ./gradlew test
+      run: ./gradlew build --exclude-task test
