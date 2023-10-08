@@ -30,6 +30,9 @@ jobs:
     - name: Build
       run: ./gradlew build --exclude-task test
 
+    - name: File Check
+      run: ls -la ./build/libs/
+
     - name: Auth With GCP
       uses: google-github-actions/auth@v1
       with:
