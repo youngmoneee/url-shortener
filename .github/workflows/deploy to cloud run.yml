@@ -30,9 +30,6 @@ jobs:
     - name: Build
       run: ./gradlew build --exclude-task test
 
-    - name: File Check
-      run: ls -la ./build/libs/
-
     - name: Auth With GCP
       uses: google-github-actions/auth@v1
       with:
@@ -40,14 +37,17 @@ jobs:
     
     - name: Set up Cloud CLI
       uses: google-github-actions/setup-gcloud@v1
-    
+
+    #  Cloud Build -> Docker
     - name: Build and Push Docker image
       run: | 
-        gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/surl
-    
+        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_SERVICE_NAME }} .
+        gcloud auth configure-docker
+        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_SERVICE_NAME }}
+        
     - name: Deploy to Cloud Run
       run: |
         gcloud run deploy ${{ secrets.GCP_SERVICE_NAME }} \
-          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/surl \
+          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_SERVICE_NAME }} \
           --region ${{ secrets.GCP_REGION }} \
           --platform managed
