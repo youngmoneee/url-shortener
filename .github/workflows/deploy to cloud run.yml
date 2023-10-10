@@ -50,5 +50,5 @@ jobs:
         gcloud run deploy ${{ secrets.GCP_SERVICE_NAME }} \
           --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }} \
           --region ${{ secrets.GCP_REGION }} \
-          --vpc-connector projects/${{ secrets.GCP_PROJECT_NAME }}/locations/${{ secrets.GCP_REGION }}/connectors/${{ secrets.GCP_VPC_NAME }} \
+          --vpc-connector projects/${{ secrets.GCP_PROJECT_ID }}/locations/${{ secrets.GCP_REGION }}/connectors/${{ secrets.GCP_VPC_NAME }} \
           --platform managed
