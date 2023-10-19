@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class UrlDto {
+	public UrlDto(){};
 	public UrlDto(UrlEntity urlEntity) {
 		this.longUrl = urlEntity.getLongUrl();
 		this.shortUrl = urlEntity.getShortUrl();
