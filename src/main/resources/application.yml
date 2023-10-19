@@ -20,5 +20,6 @@ spring:
 server:
   port: ${PORT:8080}
 
-hash:
-  base: 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+const:
+  base: ${BASE_CODE}
+  root: ${YOUR_DOMAIN}
