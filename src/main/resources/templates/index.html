@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>URL Shortener</title>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('shortenButton')
+                .addEventListener('click', (e) => {
+                e.preventDefault();
+
+                let longUrl = document.getElementById('longUrl').value;
+                let req = new XMLHttpRequest();
+
+                req.open("POST", '/api', true);
+                req.setRequestHeader('Content-Type', 'application/text');
+
+                req.onreadystatechange = () => {
+                    if (req.status === 200) document.getElementById('shortUrl').textContent = req.responseText;
+                };
+                req.send(longUrl);
+            });
+        });
+    </script>
+</head>
+<body>
+<h2>URL Shortener</h2>
+<form>
+    <input type="text" id="longUrl" name="longUrl" placeholder="Source Url"><br>
+    <button id="shortenButton">Get Short Url</button>
+</form>
+<h3>Shortened URL:</h3>
+<p id="shortUrl"></p>
+</body>
+</html>
