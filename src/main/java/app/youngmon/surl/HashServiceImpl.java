@@ -7,23 +7,25 @@ import app.youngmon.surl.interfaces.HashJpaRepository;
 import app.youngmon.surl.interfaces.HashService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Optional;
 
 @Slf4j
 public class HashServiceImpl implements HashService {
+    @Value("${const.root}")
+    private String      domain;
+    @Value("${const.base}")
+    private String      hashBase;
     private final
     HashJpaRepository   hashRepository;
-    private final
-    String              hashBase;
     private final
     HashCache           hashCache;
 
 
     @Autowired
-    HashServiceImpl(String hashBase, HashCache cache, HashJpaRepository hashRepository)
+    HashServiceImpl(HashCache cache, HashJpaRepository hashRepository)
     {
-        this.hashBase = hashBase;
         this.hashCache = cache;
         this.hashRepository = hashRepository;
     }
@@ -39,6 +41,10 @@ public class HashServiceImpl implements HashService {
     getHashBaseLength() {
         return this.hashBase.length();
     }
+
+    @Override
+    public String
+    getDomain() { return domain; }
 
     @Override
     public String
