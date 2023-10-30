@@ -13,8 +13,6 @@ import java.util.Optional;
 
 @Slf4j
 public class HashServiceImpl implements HashService {
-    @Value("${const.root}")
-    private String      domain;
     @Value("${const.base}")
     private String      hashBase;
     private final
@@ -37,16 +35,6 @@ public class HashServiceImpl implements HashService {
     }
 
     @Override
-    public int
-    getHashBaseLength() {
-        return this.hashBase.length();
-    }
-
-    @Override
-    public String
-    getDomain() { return domain; }
-
-    @Override
     public String
     getShortUrl(String longUrl) {
         return findShortUrlOnRepository(longUrl).orElseGet(() ->
@@ -58,10 +46,7 @@ public class HashServiceImpl implements HashService {
     getLongUrl(String shortUrl) {
         //  Cache Hit
         String  url = this.hashCache.findUrlByKey(shortUrl);
-        if (url != null) {
-            log.info("Cache Hit");
-            return url;
-        }
+        if (url != null) return url;
 
         //  Else
         Long    id = decode(shortUrl);
@@ -77,26 +62,19 @@ public class HashServiceImpl implements HashService {
 
     public String
     encode(Long id) {
-        char    tmp = getHashBaseArr()[(int) (id % getHashBaseLength())];
-        if (id < getHashBaseLength()) return String.valueOf(tmp);
-        return tmp + encode(id / getHashBaseLength());
-    };
+        char    tmp = getHashBaseArr()[(int) (id % hashBase.length())];
+        if (id < hashBase.length()) return String.valueOf(tmp);
+        return tmp + encode(id / hashBase.length());
+    }
 
     public Long
     decode(String code) {
-        Long    res = 0L;
+        long    res = 0L;
         for (char c : code.toCharArray()) {
-            res *= getHashBaseLength();
-            res += decode(c);
+            res *= hashBase.length();
+            res += hashBase.indexOf(c);
         }
         return res;
-    }
-
-    private Long
-    decode(char c) {
-        if (c >= '0' && c <= '9') return (long)(c - '0');
-        if (c >= 'A' && c <= 'Z') return (long)(c - 'A' + 10);
-        return (long)(c - 'a' + 10 + 26);
     }
 
     private Optional<String>
