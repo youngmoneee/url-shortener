@@ -1,5 +1,6 @@
 package app.youngmon.surl;
 
+import app.youngmon.surl.exception.BadRequestException;
 import app.youngmon.surl.exception.NotFoundException;
 import app.youngmon.surl.interfaces.HashService;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class HashRestController {
     private final HashService hashService;
 
@@ -19,26 +20,32 @@ public class HashRestController {
         this.hashService = hashService;
     }
 
-    @GetMapping("/docs")
-    String docs() {
-        return "[TMP DOCS]\nYou can convert shortUrl to longUrl or longUrl to shortUrl";
-    }
-
     @PostMapping
     String makeShort(@RequestBody String code) {
+        //  TODO: Validation -> Annotation으로 변경하기
+        if (code == null || !code.matches(
+                "^(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})([/\\w .-]*)*/?(\\?[\\w =&.-]*)?$"
+        ))
+            throw new BadRequestException("Required Origin Url");
         return this.hashService.getShortUrl(code);
     }
 
     @GetMapping("/{code}")
-    String getOrigin(@PathVariable String code) {
-        return this.hashService.getLongUrl(code);
-    }
+    String getOrigin(@PathVariable String code) { return this.hashService.getLongUrl(code); }
 
     @ExceptionHandler(NotFoundException.class)
     ResponseEntity<String>  notFoundException(NotFoundException e) {
         log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    ResponseEntity<String>  badRequestException(BadRequestException e) {
+        log.error(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
     }
 }
