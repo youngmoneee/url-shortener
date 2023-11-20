@@ -1,69 +1,106 @@
 package app.youngmon.surl.e2e;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
+@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class HashTest {
-
 	@Autowired
 	private TestRestTemplate restTemplate;
 
+	@Container
+	private static final GenericContainer redisContainer = new GenericContainer<>("redis:latest").withExposedPorts(6379);
+	static {
+		redisContainer.start();
+	}
+
+	@DynamicPropertySource
+	static void redisProperty(DynamicPropertyRegistry registry) {
+		registry.add("spring.data.redis.host", () -> redisContainer.getHost());
+		registry.add("spring.data.redis.port", () -> redisContainer.getFirstMappedPort());
+	}
+
 	@Test
-	public void getShortUrlAndRedirect() {
+	@DisplayName("API Long to Short Transfer Test")
+	public void getShortUrl() {
 		//  given
 		String longUrl = "https://www.example.com";
 
 		//  when
-		ResponseEntity<String> createResponse = restTemplate.postForEntity("/", longUrl, String.class);
+		ResponseEntity<String> createResponse = restTemplate.postForEntity("/api/v1", longUrl, String.class);
 
 		//  then
 		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-		String shortUrl = createResponse.getBody();
-
-		//  when
-		ResponseEntity<String> redirectResponse = restTemplate.getForEntity("/" + shortUrl, String.class);
-
-		//  then
-		assertThat(redirectResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(redirectResponse.getBody()).isEqualTo(longUrl);
 	}
 
 	@Test
-	public void shouldReturn404() {
+	@DisplayName("Http Format::Should Be 200 OK")
+	public void httpTest() {
 		//  given
-		String wrongUrl = "nonExistent";
+		String  url = "https://www.naver.com";
 
 		//  when
-		ResponseEntity<String> response = restTemplate.getForEntity("/" + wrongUrl, String.class);
+		ResponseEntity<String> createResponse = restTemplate.postForEntity("/api/v1", url, String.class);
 
 		//  then
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
 	@Test
-	public void noPathShoulRedirectDocs() {
+	@DisplayName("Http Format::Should Be 400 Bad Request")
+	public void wrongHttpTest() {
+		//  given
+		String url = "https:/www.naver.com";
+
 		//  when
-		ResponseEntity<String> response = restTemplate.getForEntity("/", String.class);
+		ResponseEntity<String> createResponse = restTemplate.postForEntity("/api/v1", url, String.class);
 
 		//  then
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody()).contains("DOCS");
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 	}
 
 	@Test
-	public void getDocs_ShouldReturnDocs() {
+	@DisplayName("No Payload::Should Be 400 Bad Reqeust")
+	public void noPayloadTest() {
+		//  given
+		String url = "";
+
 		//  when
-		ResponseEntity<String> response = restTemplate.getForEntity("/docs", String.class);
+		ResponseEntity<String> createResponse = restTemplate.postForEntity("/api/v1", url, String.class);
 
 		//  then
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody()).contains("DOCS");
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+	}
+
+	@Test
+	@DisplayName("Get Origin Url")
+	public void getOriginUrl() {
+		//  given
+		String shortUrl = "1";
+		String longUrl = "https://www.example.com";
+
+		//  when
+		ResponseEntity<String> postRes = restTemplate.postForEntity("/api/v1", longUrl, String.class);
+		ResponseEntity<String> getRes = restTemplate.getForEntity("/api/v1/" + shortUrl, String.class);
+
+		//  then
+		assertThat(postRes.getBody()).isEqualTo(shortUrl);
+		assertThat(getRes.getBody()).isEqualTo(longUrl);
 	}
 }
