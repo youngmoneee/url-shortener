@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: prod
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: ${DB_URL}
@@ -21,5 +19,4 @@ server:
   port: ${PORT:8080}
 
 const:
-  base: ${BASE_CODE}
-  root: ${YOUR_DOMAIN}
+  base: 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
