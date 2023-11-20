@@ -33,20 +33,6 @@ public class HashServiceTest {
     }
 
     @Test
-    @DisplayName("Get HaseBase Length Test")
-    void getHashBeseLengthTest() {
-        //  given
-        int expectedLen = hashBase.length();
-        when(service.getHashBaseLength()).thenReturn(hashBase.length());
-
-        //  when
-        int res = service.getHashBaseLength();
-
-        //  then
-        assertThat(res).isEqualTo(expectedLen);
-    }
-
-    @Test
     @DisplayName("Get Short Url Test")
     void getShortUrlTest() {
         //  given
