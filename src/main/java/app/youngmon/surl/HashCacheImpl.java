@@ -15,13 +15,13 @@ public class HashCacheImpl implements HashCache {
     }
 
     @Override
-    public String   createKV(String key, String value) {
+    public String   set(String key, String value) {
         redis.opsForValue().set(key, value);
         return key;
     }
 
     @Override
-    public String   findUrlByKey(String key) {
+    public String   get(String key) {
         return redis.opsForValue().get(key);
     }
 }

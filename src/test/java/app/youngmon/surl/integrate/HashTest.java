@@ -59,7 +59,7 @@ public class HashTest {
         urlEntity.setShortUrl(shortUrl);
 
         // Mocking repository behavior
-        when(hashCache.findUrlByKey(shortUrl)).thenReturn(null);
+        when(hashCache.get(shortUrl)).thenReturn(null);
         when(hashRepository.findById(1L)).thenReturn(Optional.of(urlEntity));
 
         // When

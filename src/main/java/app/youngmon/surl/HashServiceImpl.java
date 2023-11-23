@@ -47,7 +47,7 @@ public class HashServiceImpl implements HashService {
     @Override public String
     getLongUrl(String shortUrl) {
         //  Cache Hit
-        String  url = this.hashCache.findUrlByKey(shortUrl);
+        String  url = this.hashCache.get(shortUrl);
         if (url != null) return url;
 
         //  Else
@@ -57,7 +57,7 @@ public class HashServiceImpl implements HashService {
                 .orElseThrow(()-> new NotFoundException("Not Found Url"));
 
         //  Cache Registry
-        this.hashCache.createKV(shortUrl, longUrl);
+        this.hashCache.set(shortUrl, longUrl);
         log.info("Registry {} : {}", shortUrl, longUrl);
         return longUrl;
     }
