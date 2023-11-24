@@ -1,6 +1,6 @@
 package app.youngmon.surl.interfaces;
 
-public interface HashCache {
+public interface CacheRepository {
     String   set(String key, String value);
     String   get(String key);
 }
