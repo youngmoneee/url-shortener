@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Hash Cache Test")
-public class HashCacheTest {
+public class CacheRepositoryTest {
     @Mock
     CacheRepository mockHashCache;
 

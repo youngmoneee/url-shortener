@@ -20,13 +20,13 @@ import static org.mockito.Mockito.when;
 public class UrlIntegrateTest {
 
     @Autowired
-    private UrlService hashService;
+    private UrlService          service;
 
     @MockBean
-    private DbRepository hashRepository;
+    private DbRepository        repository;
 
     @MockBean
-    private CacheRepository hashCache;
+    private CacheRepository     cache;
 
     @Test
     @DisplayName("Get Short URL and Validate")
@@ -38,11 +38,11 @@ public class UrlIntegrateTest {
         urlEntity.setShortUrl("1");
 
         // Mocking repository behavior
-        when(hashRepository.findUrlEntityByLongUrl(longUrl)).thenReturn(Optional.of(urlEntity));
-        when(hashRepository.save(new UrlEntity(longUrl))).thenReturn(urlEntity);
+        when(repository.findUrlEntityByLongUrl(longUrl)).thenReturn(Optional.of(urlEntity));
+        when(repository.save(new UrlEntity(longUrl))).thenReturn(urlEntity);
 
         // When
-        String shortUrl = hashService.getShortUrl(longUrl);
+        String shortUrl = service.getShortUrl(longUrl);
 
         // Then
         assertThat(shortUrl).isNotNull().isEqualTo("1");
@@ -59,7 +59,7 @@ public class UrlIntegrateTest {
         urlEntity.setShortUrl(shortUrl);
 
         // Mocking repository behavior
-        when(hashCache.get(shortUrl)).thenReturn(null);
+        when(hashCache.findUrlByKey(shortUrl)).thenReturn(null);
         when(hashRepository.findById(1L)).thenReturn(Optional.of(urlEntity));
 
         // When
