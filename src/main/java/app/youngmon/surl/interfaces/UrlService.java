@@ -1,6 +1,6 @@
 package app.youngmon.surl.interfaces;
 
-public interface HashService {
+public interface UrlService {
     String   getShortUrl(String longUrl);
     String   getLongUrl(String shortUrl);
 }
