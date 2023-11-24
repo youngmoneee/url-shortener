@@ -1,6 +1,6 @@
 package app.youngmon.surl.unit;
 
-import app.youngmon.surl.interfaces.HashCache;
+import app.youngmon.surl.interfaces.CacheRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,9 +12,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Hash Cache Test")
-public class HashCacheTest {
+public class CacheRepositoryTest {
     @Mock
-    HashCache mockHashCache;
+    CacheRepository mockHashCache;
 
     @Test
     @DisplayName("createKV Test")
@@ -22,10 +22,10 @@ public class HashCacheTest {
         //  given
         String  key = "key";
         String  value = "value";
-        when(mockHashCache.createKV(key, value)).thenReturn(value);
+        when(mockHashCache.set(key, value)).thenReturn(value);
 
         //  when
-        String  res = mockHashCache.createKV(key, value);
+        String  res = mockHashCache.set(key, value);
 
         //  then
         assertThat(res).isEqualTo(value);
@@ -37,10 +37,10 @@ public class HashCacheTest {
         //  given
         String  key = "key";
         String  expectedUrl = "url";
-        when(mockHashCache.findUrlByKey(key)).thenReturn(expectedUrl);
+        when(mockHashCache.get(key)).thenReturn(expectedUrl);
 
         //  when
-        String  res = mockHashCache.findUrlByKey(key);
+        String  res = mockHashCache.get(key);
 
         //  then
         assertThat(res).isEqualTo(expectedUrl);

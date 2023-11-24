@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class HashTest {
+public class UrlE2eTest {
 	@Autowired
 	private TestRestTemplate restTemplate;
 

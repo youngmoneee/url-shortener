@@ -1,6 +1,6 @@
 package app.youngmon.surl.unit;
 
-import app.youngmon.surl.interfaces.HashService;
+import app.youngmon.surl.interfaces.UrlService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,25 +12,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("HashService Test")
-public class HashServiceTest {
+public class UrlServiceTest {
     @Mock
-    HashService service;
-
-    final String hashBase = "1234";
-
-    @Test
-    @DisplayName("Get HashBase Test")
-    void getHashBaseTest() {
-        //  given
-        char[] expectedHashBase = {'1', '2', '3', '4'};
-        when(service.getHashBaseArr()).thenReturn(hashBase.toCharArray());
-
-        //  when
-        char[] res = service.getHashBaseArr();
-
-        //  then
-        assertThat(res).isEqualTo(expectedHashBase);
-    }
+    UrlService service;
 
     @Test
     @DisplayName("Get Short Url Test")

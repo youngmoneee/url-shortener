@@ -2,7 +2,7 @@ package app.youngmon.surl;
 
 import app.youngmon.surl.exception.BadRequestException;
 import app.youngmon.surl.exception.NotFoundException;
-import app.youngmon.surl.interfaces.HashService;
+import app.youngmon.surl.interfaces.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
-public class HashRestController {
-    private final HashService hashService;
+public class UrlRestController {
+    private final UrlService hashService;
 
     @Autowired
-    HashRestController(HashService hashService) {
+    UrlRestController(UrlService hashService) {
         this.hashService = hashService;
     }
 

@@ -1,9 +1,9 @@
 package app.youngmon.surl.integrate;
 
 import app.youngmon.surl.datas.UrlEntity;
-import app.youngmon.surl.interfaces.HashCache;
-import app.youngmon.surl.interfaces.HashJpaRepository;
-import app.youngmon.surl.interfaces.HashService;
+import app.youngmon.surl.interfaces.CacheRepository;
+import app.youngmon.surl.interfaces.DbRepository;
+import app.youngmon.surl.interfaces.UrlService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +17,16 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("Integration Test")
 @SpringBootTest
-public class HashTest {
+public class UrlIntegrateTest {
 
     @Autowired
-    private HashService         hashService;
+    private UrlService          service;
 
     @MockBean
-    private HashJpaRepository   hashRepository;
+    private DbRepository        repository;
 
     @MockBean
-    private HashCache           hashCache;
+    private CacheRepository     cache;
 
     @Test
     @DisplayName("Get Short URL and Validate")
@@ -38,11 +38,11 @@ public class HashTest {
         urlEntity.setShortUrl("1");
 
         // Mocking repository behavior
-        when(hashRepository.findUrlEntityByLongUrl(longUrl)).thenReturn(Optional.of(urlEntity));
-        when(hashRepository.save(new UrlEntity(longUrl))).thenReturn(urlEntity);
+        when(repository.findUrlEntityByLongUrl(longUrl)).thenReturn(Optional.of(urlEntity));
+        when(repository.save(new UrlEntity(longUrl))).thenReturn(urlEntity);
 
         // When
-        String shortUrl = hashService.getShortUrl(longUrl);
+        String shortUrl = service.getShortUrl(longUrl);
 
         // Then
         assertThat(shortUrl).isNotNull().isEqualTo("1");
@@ -59,11 +59,11 @@ public class HashTest {
         urlEntity.setShortUrl(shortUrl);
 
         // Mocking repository behavior
-        when(hashCache.findUrlByKey(shortUrl)).thenReturn(null);
-        when(hashRepository.findById(1L)).thenReturn(Optional.of(urlEntity));
+        when(cache.get(shortUrl)).thenReturn(null);
+        when(repository.findById(1L)).thenReturn(Optional.of(urlEntity));
 
         // When
-        String res = hashService.getLongUrl(shortUrl);
+        String res = service.getLongUrl(shortUrl);
 
         // Then
         assertThat(res).isNotNull().isEqualTo(longUrl);
