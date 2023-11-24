@@ -1,7 +1,7 @@
 package app.youngmon.surl.unit;
 
 import app.youngmon.surl.datas.UrlEntity;
-import app.youngmon.surl.interfaces.HashJpaRepository;
+import app.youngmon.surl.interfaces.JpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +15,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("HashRepository Test")
-public class HashRepositoryTest {
+public class HashUrlRepositoryTest {
     @Mock
-    HashJpaRepository mockHashRepository;
+    JpaRepository mockHashRepository;
 
     @Test
     @DisplayName("createUrl not exist Test")

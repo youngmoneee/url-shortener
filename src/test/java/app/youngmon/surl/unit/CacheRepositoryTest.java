@@ -1,6 +1,6 @@
 package app.youngmon.surl.unit;
 
-import app.youngmon.surl.interfaces.HashCache;
+import app.youngmon.surl.interfaces.CacheRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Hash Cache Test")
 public class HashCacheTest {
     @Mock
-    HashCache mockHashCache;
+    CacheRepository mockHashCache;
 
     @Test
     @DisplayName("createKV Test")

@@ -1,9 +1,9 @@
 package app.youngmon.surl.integrate;
 
 import app.youngmon.surl.datas.UrlEntity;
-import app.youngmon.surl.interfaces.HashCache;
-import app.youngmon.surl.interfaces.HashJpaRepository;
-import app.youngmon.surl.interfaces.HashService;
+import app.youngmon.surl.interfaces.CacheRepository;
+import app.youngmon.surl.interfaces.JpaRepository;
+import app.youngmon.surl.interfaces.UrlService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +20,13 @@ import static org.mockito.Mockito.when;
 public class HashTest {
 
     @Autowired
-    private HashService         hashService;
+    private UrlService hashService;
 
     @MockBean
-    private HashJpaRepository   hashRepository;
+    private JpaRepository hashRepository;
 
     @MockBean
-    private HashCache           hashCache;
+    private CacheRepository hashCache;
 
     @Test
     @DisplayName("Get Short URL and Validate")

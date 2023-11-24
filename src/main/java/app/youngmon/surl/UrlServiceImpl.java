@@ -2,8 +2,8 @@ package app.youngmon.surl;
 
 import app.youngmon.surl.datas.UrlEntity;
 import app.youngmon.surl.exception.NotFoundException;
-import app.youngmon.surl.interfaces.HashCache;
-import app.youngmon.surl.interfaces.HashJpaRepository;
+import app.youngmon.surl.interfaces.CacheRepository;
+import app.youngmon.surl.interfaces.JpaRepository;
 import app.youngmon.surl.interfaces.HashService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,25 +15,16 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class HashServiceImpl implements HashService {
-    @Value("${const.base}")
-    private String      hashBase;
     private final
-    HashJpaRepository   hashRepository;
+    JpaRepository hashRepository;
     private final
-    HashCache           hashCache;
-
+    CacheRepository hashCache;
 
     @Autowired
-    HashServiceImpl(HashCache cache, HashJpaRepository hashRepository)
+    HashServiceImpl(CacheRepository cache, JpaRepository hashRepository)
     {
         this.hashCache = cache;
         this.hashRepository = hashRepository;
-    }
-
-    @Override
-    public char[]
-    getHashBaseArr() {
-        return this.hashBase.toCharArray();
     }
 
     @Override
@@ -60,23 +51,6 @@ public class HashServiceImpl implements HashService {
         this.hashCache.set(shortUrl, longUrl);
         log.info("Registry {} : {}", shortUrl, longUrl);
         return longUrl;
-    }
-
-    public String
-    encode(Long id) {
-        char    tmp = getHashBaseArr()[(int) (id % hashBase.length())];
-        if (id < hashBase.length()) return String.valueOf(tmp);
-        return tmp + encode(id / hashBase.length());
-    }
-
-    public Long
-    decode(String code) {
-        long    res = 0L;
-        for (char c : code.toCharArray()) {
-            res *= hashBase.length();
-            res += hashBase.indexOf(c);
-        }
-        return res;
     }
 
     private Optional<String>
