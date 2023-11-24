@@ -1,7 +1,7 @@
 package app.youngmon.surl;
 
 import app.youngmon.surl.datas.UrlDto;
-import app.youngmon.surl.interfaces.HashService;
+import app.youngmon.surl.interfaces.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,11 +14,11 @@ import org.springframework.web.servlet.view.RedirectView;
 @Controller
 @RequestMapping("/")
 @Slf4j
-public class HashController {
-	private final HashService service;
+public class UrlController {
+	private final UrlService service;
 
 	@Autowired
-	HashController(HashService service) {
+	UrlController(UrlService service) {
 		this.service = service;
 	}
 
