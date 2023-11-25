@@ -1,19 +1,24 @@
 package app.youngmon.surl.e2e;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.data.redis.connection.RedisCommands;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,12 +28,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UrlE2eTest {
 	@Autowired
 	private TestRestTemplate restTemplate;
+	@Autowired
+	private RedisTemplate<?,?> redisTemplate;
 
 	@Container
 	private static final GenericContainer redisContainer = new GenericContainer<>("redis:latest").withExposedPorts(6379);
-	static {
-		redisContainer.start();
-	}
 
 	@DynamicPropertySource
 	static void redisProperty(DynamicPropertyRegistry registry) {
@@ -36,11 +40,16 @@ public class UrlE2eTest {
 		registry.add("spring.data.redis.port", () -> redisContainer.getFirstMappedPort());
 	}
 
+	@BeforeEach
+	void clearCache() {
+		redisTemplate.getConnectionFactory().getConnection().commands().flushAll();
+	}
+
 	@Test
 	@DisplayName("API Long to Short Transfer Test")
 	public void getShortUrl() {
 		//  given
-		String longUrl = "https://www.example.com";
+		String longUrl = "https://" + "getShortUrl" + ".com";
 
 		//  when
 		ResponseEntity<String> createResponse = restTemplate.postForEntity("/api/v1", longUrl, String.class);
@@ -66,10 +75,11 @@ public class UrlE2eTest {
 	@DisplayName("Http Format::Should Be 400 Bad Request")
 	public void wrongHttpTest() {
 		//  given
-		String url = "https:/www.naver.com";
+		String wrongUrl = "https:/badurl.com";
+
 
 		//  when
-		ResponseEntity<String> createResponse = restTemplate.postForEntity("/api/v1", url, String.class);
+		ResponseEntity<String> createResponse = restTemplate.postForEntity("/api/v1", wrongUrl, String.class);
 
 		//  then
 		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -79,10 +89,10 @@ public class UrlE2eTest {
 	@DisplayName("No Payload::Should Be 400 Bad Reqeust")
 	public void noPayloadTest() {
 		//  given
-		String url = "";
+		String noUrl = "";
 
 		//  when
-		ResponseEntity<String> createResponse = restTemplate.postForEntity("/api/v1", url, String.class);
+		ResponseEntity<String> createResponse = restTemplate.postForEntity("/api/v1", noUrl, String.class);
 
 		//  then
 		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -92,15 +102,38 @@ public class UrlE2eTest {
 	@DisplayName("Get Origin Url")
 	public void getOriginUrl() {
 		//  given
-		String shortUrl = "1";
-		String longUrl = "https://www.example.com";
+		String longUrl = "https://" + "getOriginUrl" + ".com";
+		String shortUrl = restTemplate.postForEntity("/api/v1", longUrl, String.class).getBody();
 
 		//  when
-		ResponseEntity<String> postRes = restTemplate.postForEntity("/api/v1", longUrl, String.class);
 		ResponseEntity<String> getRes = restTemplate.getForEntity("/api/v1/" + shortUrl, String.class);
 
 		//  then
-		assertThat(postRes.getBody()).isEqualTo(shortUrl);
 		assertThat(getRes.getBody()).isEqualTo(longUrl);
+	}
+
+	@Test
+	@DisplayName("Idempotent Test")
+	public void IdempotentTest() {
+		//  given
+		int cnt = 5;
+
+		String  originUrl = "https://idempotent.test";
+		String  createdShortUrl;
+		String[]  res = new String[cnt];
+
+		//  when
+		createdShortUrl =   restTemplate.postForEntity("/api/v1", originUrl, String.class).getBody();
+		System.err.println(restTemplate.getForEntity("/api/v1/" + createdShortUrl, String.class).getBody());
+
+		for (int i = 0; i < cnt; i++) {
+			res[i] = restTemplate.getForEntity("/api/v1/" + createdShortUrl, String.class).getBody();
+		}
+
+		//  then
+		boolean allEqual = Arrays.stream(res)
+				.allMatch(url -> url.equals(res[0]));
+
+		assertThat(allEqual).isTrue();
 	}
 }
