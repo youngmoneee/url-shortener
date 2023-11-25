@@ -17,7 +17,7 @@ public class CacheRepositoryImpl implements CacheRepository {
     @Override
     public String   set(String key, String value) {
         redis.opsForValue().set(key, value);
-        return key;
+        return value;
     }
 
     @Override
