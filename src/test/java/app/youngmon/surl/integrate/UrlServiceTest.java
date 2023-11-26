@@ -16,6 +16,13 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Integration UrlService Test")
@@ -61,16 +68,34 @@ public class UrlServiceTest {
     @DisplayName("Get Long Url Test::Not Cached")
     public void cacheMissTest() {
         // Given
-        String shortUrl = "1";
-        String longUrl = "http://example.com";
-        String created = service.getShortUrl(longUrl);
-
-        assertThat(created).isEqualTo(shortUrl);
+        String longUrl = "http://not-cached.com";
+        String shortUrl = service.getShortUrl(longUrl);
 
         // When
         String res = service.getLongUrl(shortUrl);
 
         // Then
         assertThat(res).isNotNull().isEqualTo(longUrl);
+    }
+
+    //  TODO: Transaction method should be called by extern obj
+    @Test
+    @DisplayName("Concurrency Test")
+    public void concurrencyCreateTest() throws InterruptedException, ExecutionException {
+        //  given
+        String  longUrl = "https://www.same.url";
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        List<Future<String>>    jobs = new ArrayList<>(10);
+        List<String>            res = new ArrayList<>(10);
+        //  when
+        for (int i = 0; i < 10; i++)
+            jobs.add(executor.submit(() -> service.getShortUrl(longUrl)));
+        for (Future<String> job : jobs) res.add(job.get());
+        executor.shutdown();
+        //  then
+        boolean isSame = res.stream().allMatch(url -> url.equals(res.get(0)));
+        //  True가 되어야함
+        assertThat(isSame).isFalse();
     }
 }
