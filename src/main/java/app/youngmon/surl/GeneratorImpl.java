@@ -12,7 +12,7 @@ public class GeneratorImpl implements Generator {
 	public String encode(Long id) {
 		char tmp = baseCode.charAt((int)(id % baseCode.length()));
 		if (id < baseCode.length()) return String.valueOf(tmp);
-		return tmp + encode(id / baseCode.length());
+		return encode(id / baseCode.length()) + tmp;
 	}
 
 	@Override
