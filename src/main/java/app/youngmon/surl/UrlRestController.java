@@ -24,7 +24,7 @@ public class UrlRestController {
     String makeShort(@RequestBody String code) {
         //  TODO: Validation -> Annotation으로 변경하기
         if (code == null || !code.matches(
-                "^(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})([/\\w .-]*)*/?(\\?[\\w =&.-]*)?$"
+                "^(https?://)?([\\da-zA-Z.-]+)\\.([a-zA-Z.]{2,6})([/\\w .-]*)*/?(\\?[\\w =&.-]*)?$"
         ))
             throw new BadRequestException("Required Origin Url");
         return this.hashService.getShortUrl(code);
