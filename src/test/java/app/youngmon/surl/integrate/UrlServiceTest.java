@@ -1,66 +1,75 @@
 package app.youngmon.surl.integrate;
 
 import app.youngmon.surl.datas.UrlEntity;
-import app.youngmon.surl.interfaces.CacheRepository;
-import app.youngmon.surl.interfaces.DbRepository;
 import app.youngmon.surl.interfaces.UrlService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
-@DisplayName("Integration Test")
+@DisplayName("Integration UrlService Test")
 @SpringBootTest
-public class UrlIntegrateTest {
+@Testcontainers
+@Transactional
+public class UrlServiceTest {
+    @Container
+    private static final GenericContainer redisContainer = new GenericContainer<>("redis:latest").withExposedPorts(6379);
+
+    @DynamicPropertySource
+    static void redisProperty(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.redis.host", () -> redisContainer.getHost());
+        registry.add("spring.data.redis.port", () -> redisContainer.getFirstMappedPort());
+    }
 
     @Autowired
     private UrlService          service;
+    @Autowired
+    private RedisTemplate<?,?>  redisTemplate;
 
-    @MockBean
-    private DbRepository        repository;
-
-    @MockBean
-    private CacheRepository     cache;
-
-    @Test
-    @DisplayName("Get Short URL and Validate")
-    public void getShortUrlAndValidate() {
-        // Given
-        String longUrl = "http://example.com";
-        UrlEntity urlEntity = new UrlEntity(longUrl);
-        urlEntity.setId(1L);
-        urlEntity.setShortUrl("1");
-
-        // Mocking repository behavior
-        when(repository.findUrlEntityByLongUrl(longUrl)).thenReturn(Optional.of(urlEntity));
-        when(repository.save(new UrlEntity(longUrl))).thenReturn(urlEntity);
-
-        // When
-        String shortUrl = service.getShortUrl(longUrl);
-
-        // Then
-        assertThat(shortUrl).isNotNull().isEqualTo("1");
+    @BeforeEach
+    void clearCache() {
+        redisTemplate.getConnectionFactory().getConnection().commands().flushAll();
     }
 
     @Test
-    @DisplayName("Get Long URL and Validate")
-    public void getLongUrlAndValidate() {
+    @DisplayName("Get Short Url Test")
+    public void getShortUrl() {
         // Given
-        String shortUrl = "1";
         String longUrl = "http://example.com";
-        UrlEntity urlEntity = new UrlEntity(longUrl);
-        urlEntity.setId(1L);
-        urlEntity.setShortUrl(shortUrl);
 
-        // Mocking repository behavior
-        when(cache.get(shortUrl)).thenReturn(null);
-        when(repository.findById(1L)).thenReturn(Optional.of(urlEntity));
+        // When
+        String  created = service.getShortUrl(longUrl);
+        String  res = service.getLongUrl(created);
+
+        // Then
+        assertThat(created).isNotNull();
+        assertThat(res).isEqualTo(longUrl);
+    }
+
+    @Test
+    @DisplayName("Get Long Url Test::Not Cached")
+    public void cacheMissTest() {
+        // Given
+        String longUrl = "http://not-cached.com";
+        String shortUrl = service.getShortUrl(longUrl);
 
         // When
         String res = service.getLongUrl(shortUrl);
@@ -68,4 +77,27 @@ public class UrlIntegrateTest {
         // Then
         assertThat(res).isNotNull().isEqualTo(longUrl);
     }
+
+    //  TODO: Transaction method should be called by extern obj
+    /*
+    @Test
+    @DisplayName("Concurrency Test")
+    public void concurrencyCreateTest() throws InterruptedException, ExecutionException {
+        //  given
+        String  longUrl = "https://www.same.url";
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        List<Future<String>>    jobs = new ArrayList<>(10);
+        List<String>            res = new ArrayList<>(10);
+        //  when
+        for (int i = 0; i < 10; i++)
+            jobs.add(executor.submit(() -> service.getShortUrl(longUrl)));
+        for (Future<String> job : jobs) res.add(job.get());
+        executor.shutdown();
+        //  then
+        boolean isSame = res.stream().allMatch(url -> url.equals(res.get(0)));
+        //  True가 되어야함
+        //assertThat(isSame).isFalse();
+    }
+    */
 }
