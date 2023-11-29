@@ -92,7 +92,7 @@ public class GeneratorTest {
 
 		//  when & then
 		assertThatThrownBy(() -> generator.encode(id))
-				.isInstanceOf(StringIndexOutOfBoundsException.class);
+				.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
@@ -103,6 +103,6 @@ public class GeneratorTest {
 
 		//  when & then
 		assertThatThrownBy(() -> generator.decode(code))
-				.isInstanceOf(StringIndexOutOfBoundsException.class);
+				.isInstanceOf(IllegalArgumentException.class);
 	}
 }
