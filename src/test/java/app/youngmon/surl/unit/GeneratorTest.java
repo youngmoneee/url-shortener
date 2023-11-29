@@ -44,10 +44,10 @@ public class GeneratorTest {
 	@DisplayName("Encode 인코드 경계값 테스트")
 	public void encodeBoundaryTest() {
 		//  given
-		Long    id = 61L;
-		Long    id2 = 62L;
-		Long    id3 = (long)Math.pow(62, 5);
-		Long    id4 = id3 - 1;
+		long    id = 61L;
+		long    id2 = 62L;
+		long    id3 = 62L * 62L * 62L * 62L * 62L;
+		long    id4 = id3 - 1;
 
 		//  when
 		String  code = generator.encode(id);
@@ -92,7 +92,7 @@ public class GeneratorTest {
 
 		//  when & then
 		assertThatThrownBy(() -> generator.encode(id))
-				.isInstanceOf(StringIndexOutOfBoundsException.class);
+				.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
@@ -103,6 +103,6 @@ public class GeneratorTest {
 
 		//  when & then
 		assertThatThrownBy(() -> generator.decode(code))
-				.isInstanceOf(StringIndexOutOfBoundsException.class);
+				.isInstanceOf(IllegalArgumentException.class);
 	}
 }
