@@ -2,6 +2,7 @@ package app.youngmon.surl.unit;
 
 import app.youngmon.surl.datas.UrlEntity;
 import app.youngmon.surl.interfaces.DbRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,19 @@ public class UrlRepositoryTest {
     @Autowired
     private DbRepository repository;
 
+    @BeforeEach
+    public void clear() {
+        repository.deleteAll();
+    }
+
     @Test
-    @DisplayName("존재하지 않는 URL 생성")
+    @DisplayName("DI 테스트")
+    public void InitTest() {
+        assertThat(repository).isInstanceOf(DbRepository.class);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 Long Url -> Short Url")
     public void saveTest() {
         //  given
         UrlEntity   urlEntity = new UrlEntity();
@@ -40,7 +52,7 @@ public class UrlRepositoryTest {
     }
 
     @Test
-    @DisplayName("findByUrl - 존재")
+    @DisplayName("이미 존재하는 Long Url -> Short Url")
     public void findByUrlExistTest() {
         //  given
         String      longUrl = "https://long.url";
@@ -60,11 +72,11 @@ public class UrlRepositoryTest {
     }
 
     @Test
-    @DisplayName("findById - 존재")
+    @DisplayName("findById - 존재 O")
     public void findByIdTest() {
         //  given
-        UrlEntity   urlEntity = new UrlEntity();
-        Long        id = this.repository.save(urlEntity).getId();
+        UrlEntity   urlEntity = repository.save(new UrlEntity());
+        Long        id = urlEntity.getId();
 
         //  when
         Optional<UrlEntity>  res = this.repository.findById(id);
@@ -79,6 +91,20 @@ public class UrlRepositoryTest {
     public void findByIdNotExist() {
         //  given
         Long        id = 99999L;
+
+        //  when
+        Optional<UrlEntity> res = this.repository.findById(id);
+
+        //  then
+        assertThat(res.isPresent()).isFalse();
+        assertThatThrownBy(res::get).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("findById - Negative id")
+    public void findByIdNegative() {
+        //  given
+        Long        id = -1L;
 
         //  when
         Optional<UrlEntity> res = this.repository.findById(id);
