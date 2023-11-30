@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 public class GeneratorTest {
@@ -14,7 +15,7 @@ public class GeneratorTest {
 	Generator   generator;
 
 	@Test
-	@DisplayName("Encode Test")
+	@DisplayName("Encode 동작 테스트")
 	public void encodeTest() {
 		//  given
 		Long    id = 1L;
@@ -27,7 +28,7 @@ public class GeneratorTest {
 	}
 
 	@Test
-	@DisplayName("Decode Test")
+	@DisplayName("Decode 동작 테스트")
 	public void decodeTest() {
 		//  given
 		String code = "1";
@@ -40,13 +41,13 @@ public class GeneratorTest {
 	}
 
 	@Test
-	@DisplayName("Encode Boundary Test")
+	@DisplayName("Encode 인코드 경계값 테스트")
 	public void encodeBoundaryTest() {
 		//  given
-		Long    id = 61L;
-		Long    id2 = 62L;
-		Long    id3 = (long)Math.pow(62, 5);
-		Long    id4 = id3 - 1;
+		long    id = 61L;
+		long    id2 = 62L;
+		long    id3 = 62L * 62L * 62L * 62L * 62L;
+		long    id4 = id3 - 1;
 
 		//  when
 		String  code = generator.encode(id);
@@ -62,7 +63,7 @@ public class GeneratorTest {
 	}
 
 	@Test
-	@DisplayName("Decode Boundary Test")
+	@DisplayName("Decode 경계값 테스트")
 	public void decodeLongTest() {
 		//  given
 		String  code = "Z";
@@ -81,5 +82,27 @@ public class GeneratorTest {
 		assertThat(id2).isEqualTo(62L);
 		assertThat(id3).isEqualTo((long) Math.pow(62, 5));
 		assertThat(id4).isEqualTo((long) Math.pow(62, 5) - 1);
+	}
+
+	@Test
+	@DisplayName("Encode 잘못된 값 테스트")
+	public void validationTest() {
+		//  given
+		long    id = -1;
+
+		//  when & then
+		assertThatThrownBy(() -> generator.encode(id))
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	@DisplayName("Decode 잘못된 값 테스트")
+	public void validationDecodeTest() {
+		//  given
+		String  code = "-=+";
+
+		//  when & then
+		assertThatThrownBy(() -> generator.decode(code))
+				.isInstanceOf(IllegalArgumentException.class);
 	}
 }
