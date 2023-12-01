@@ -38,8 +38,8 @@ public class UrlRepositoryTest {
     public void saveTest() {
         //  given
         UrlEntity   urlEntity = new UrlEntity();
-        String      longUrl = "url";
-        String      shortUrl = "sUrl";
+        String      longUrl = "https://long.url";
+        String      shortUrl = "https://short.url";
 
         urlEntity.setLongUrl(longUrl);
         urlEntity.setShortUrl(shortUrl);
