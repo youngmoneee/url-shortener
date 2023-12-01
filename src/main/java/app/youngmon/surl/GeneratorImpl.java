@@ -26,6 +26,8 @@ public class GeneratorImpl implements Generator {
 		for (char c : code.toCharArray()) {
 			int idx = baseCode.indexOf(c);
 			if (idx < 0) throw new IllegalArgumentException("Decode Error");
+			if (Long.MAX_VALUE / prod < res || Long.MAX_VALUE - idx < res * prod)
+				throw new IllegalArgumentException("Decode Overflow");
 			res = res * prod + idx;
 		}
 		return res;
