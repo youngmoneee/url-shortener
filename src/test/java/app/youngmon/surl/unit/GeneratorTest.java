@@ -105,4 +105,51 @@ public class GeneratorTest {
 		assertThatThrownBy(() -> generator.decode(code))
 				.isInstanceOf(IllegalArgumentException.class);
 	}
+
+	@Test
+	@DisplayName("Encode 경계값 테스트 LongMAX")
+	public void longMaxEncodeTest() {
+		//  given
+		Long    id = Long.MAX_VALUE;
+
+		//  when
+		String  res = generator.encode(id);
+
+		//  then
+		assertThat(res).isEqualTo("aZl8N0y58M7");
+	}
+
+	@Test
+	@DisplayName("Encode 경계값 테스트 LongMAX + 1")
+	public void longMaxPPEncodeTest() {
+		//  given
+		Long    id = Long.MAX_VALUE + 1;
+
+		//  when & then
+		assertThatThrownBy(() -> generator.encode(id))
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	@DisplayName("Decode 경계값 테스트 LongMAX")
+	public void longMaxDecodeTest() {
+		//  given
+		String  code = "aZl8N0y58M7";
+
+		//  when
+		Long    id = generator.decode(code);
+
+		//  then
+		assertThat(id).isEqualTo(Long.MAX_VALUE);
+	}
+	@Test
+	@DisplayName("Decode 경계값 테스트 LongMAX + 1")
+	public void longMaxPPDecodeTest() {
+		//  given
+		String  code = "aZl8N0y58M8";
+
+		//  when & then
+		assertThatThrownBy(() -> generator.decode(code))
+				.isInstanceOf(IllegalArgumentException.class);
+	}
 }
