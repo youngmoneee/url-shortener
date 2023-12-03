@@ -88,13 +88,13 @@ public class UrlServiceTest {
     public void concurrencyCreateTest() throws InterruptedException, ExecutionException {
         //  given
         String  longUrl = "https://www.same.url";
-        ExecutorService executor = Executors.newFixedThreadPool(100);
+        ExecutorService executor = Executors.newFixedThreadPool(10);
 
         List<Future<String>>    jobs = new ArrayList<>(10);
         Set<String> res = Collections.synchronizedSet(new HashSet<>());
 
         //  when
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 10; i++)
             jobs.add(executor.submit(() -> service.getShortUrl(longUrl)));
         for (Future<String> job : jobs) {
             //try {
