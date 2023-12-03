@@ -94,16 +94,9 @@ public class UrlServiceTest {
         Set<String> res = Collections.synchronizedSet(new HashSet<>());
 
         //  when
-        for (int i = 0; i < 10; i++)
-            jobs.add(executor.submit(() -> service.getShortUrl(longUrl)));
-        for (Future<String> job : jobs) {
-            //try {
-                res.add(job.get());
-            //} catch (RuntimeException e) {
-                //  org.hibernate.AssertionFailure: null id
-                //  Hibernate Bug Handling
-            //}
-        }
+        for (int i = 0; i < 10; i++) jobs.add(executor.submit(
+                () -> service.getShortUrl(longUrl)));
+        for (Future<String> job : jobs) res.add(job.get());
         executor.shutdown();
 
         //  then
