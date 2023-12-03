@@ -5,6 +5,7 @@ import app.youngmon.surl.exception.NotFoundException;
 import app.youngmon.surl.interfaces.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,20 +27,23 @@ public class UrlServiceImpl implements UrlService {
     @Override
     public String
     getShortUrl(String longUrl) {
-        //  Trx begin
-        UrlEntity url = findOrCreate(longUrl);
-        //  Trx end
-
+        UrlEntity   url;
+        try {
+            url = this.db.findUrlEntityByLongUrl(longUrl).orElseGet(
+                    () -> this.db.save(new UrlEntity(longUrl)));;
+        } catch (DataIntegrityViolationException e) {
+            url = this.db.findUrlEntityByLongUrl(longUrl).get();
+            if (url.getShortUrl() != null) return url.getShortUrl();
+        }
         if (url.getShortUrl() != null) return url.getShortUrl();
-
-        //  Else
-        String    shortUrl = this.generator.encode(url.getId());
-        url.setShortUrl(shortUrl);
+        url.setShortUrl(this.generator.encode(url.getId()));
         this.db.save(url);
-        return shortUrl;
+        return url.getShortUrl();
     }
 
-    @Override public String
+    @Override
+    @Transactional(readOnly = true)
+    public String
     getLongUrl(String shortUrl) {
         //  Cache Hit
         String url = this.cache.get(shortUrl);
@@ -55,11 +59,5 @@ public class UrlServiceImpl implements UrlService {
         this.cache.set(shortUrl, url);
         log.debug("Registry {} : {}", shortUrl, url);
         return url;
-    }
-
-    @Transactional
-    protected UrlEntity    findOrCreate(String longUrl) {
-        return this.db.findUrlEntityByLongUrl(longUrl).orElseGet(
-                () -> this.db.save(new UrlEntity(longUrl)));
     }
 }
