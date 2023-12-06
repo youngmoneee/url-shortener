@@ -28,7 +28,7 @@ jobs:
           gradle-${{ runner.os }}-
     
     - name: Build
-      run: ./gradlew build --exclude-task test
+      run: ./gradlew build
 
     - name: Auth With GCP
       uses: google-github-actions/auth@v1
@@ -44,11 +44,12 @@ jobs:
         docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }} .
         gcloud auth configure-docker
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}
-        
-    - name: Deploy to Cloud Run
-      run: |
-        gcloud run deploy ${{ secrets.GCP_SERVICE_NAME }} \
-          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }} \
-          --region ${{ secrets.GCP_REGION }} \
-          --vpc-connector projects/${{ secrets.GCP_PROJECT_ID }}/locations/${{ secrets.GCP_REGION }}/connectors/${{ secrets.GCP_VPC_NAME }} \
-          --platform managed
+    
+    ##     
+    #- name: Deploy to Cloud Run
+    #  run: |
+    #    gcloud run deploy ${{ secrets.GCP_SERVICE_NAME }} \
+    #      --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }} \
+    #      --region ${{ secrets.GCP_REGION }} \
+    #      --vpc-connector projects/${{ secrets.GCP_PROJECT_ID }}/locations/${{ secrets.GCP_REGION }}/connectors/${{ secrets.GCP_VPC_NAME }} \
+    #      --platform managed
