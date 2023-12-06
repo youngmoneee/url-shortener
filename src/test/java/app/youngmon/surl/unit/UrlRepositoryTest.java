@@ -34,12 +34,12 @@ public class UrlRepositoryTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 Long Url -> Short Url")
+    @DisplayName("새로운 short Url 생성")
     public void saveTest() {
         //  given
         UrlEntity   urlEntity = new UrlEntity();
-        String      longUrl = "url";
-        String      shortUrl = "sUrl";
+        String      longUrl = "https://long.url";
+        String      shortUrl = "https://short.url";
 
         urlEntity.setLongUrl(longUrl);
         urlEntity.setShortUrl(shortUrl);
@@ -52,7 +52,7 @@ public class UrlRepositoryTest {
     }
 
     @Test
-    @DisplayName("이미 존재하는 Long Url -> Short Url")
+    @DisplayName("기존 LongUrl을 재생성")
     public void findByUrlExistTest() {
         //  given
         String      longUrl = "https://long.url";
@@ -67,12 +67,12 @@ public class UrlRepositoryTest {
         Optional<UrlEntity> res = this.repository.findUrlEntityByLongUrl(longUrl);
 
         //  then
-        assertThat(res.isPresent()).isTrue();
+        assertThat(res).isPresent();
         assertThat(res.get()).isEqualTo(urlEntity);
     }
 
     @Test
-    @DisplayName("findById - 존재 O")
+    @DisplayName("존재 하는 값을 findById로 조회")
     public void findByIdTest() {
         //  given
         UrlEntity   urlEntity = repository.save(new UrlEntity());
@@ -82,12 +82,12 @@ public class UrlRepositoryTest {
         Optional<UrlEntity>  res = this.repository.findById(id);
 
         //  then
-        assertThat(res.isPresent()).isTrue();
+        assertThat(res).isPresent();
         assertThat(res.get()).isEqualTo(urlEntity);
     }
 
     @Test
-    @DisplayName("findById - 존재 X")
+    @DisplayName("존재하지 않는 값을 findById로 조회")
     public void findByIdNotExist() {
         //  given
         Long        id = 99999L;
@@ -96,12 +96,12 @@ public class UrlRepositoryTest {
         Optional<UrlEntity> res = this.repository.findById(id);
 
         //  then
-        assertThat(res.isPresent()).isFalse();
+        assertThat(res).isNotPresent();
         assertThatThrownBy(res::get).isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
-    @DisplayName("findById - Negative id")
+    @DisplayName("id가 음수일 때 findById를 통해 조회")
     public void findByIdNegative() {
         //  given
         Long        id = -1L;
@@ -110,7 +110,7 @@ public class UrlRepositoryTest {
         Optional<UrlEntity> res = this.repository.findById(id);
 
         //  then
-        assertThat(res.isPresent()).isFalse();
+        assertThat(res).isNotPresent();
         assertThatThrownBy(res::get).isInstanceOf(NoSuchElementException.class);
     }
 }

@@ -15,6 +15,6 @@ public class UrlEntity {
     private Long    id;
     @Column
     private String  shortUrl;
-    @Column
+    @Column(unique = true)
     private String  longUrl;
 }

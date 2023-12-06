@@ -1,14 +1,13 @@
 package app.youngmon.surl.integrate;
 
-import app.youngmon.surl.datas.UrlEntity;
 import app.youngmon.surl.interfaces.UrlService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +15,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,11 +40,18 @@ public class UrlServiceTest {
     @Autowired
     private UrlService          service;
     @Autowired
-    private RedisTemplate<?,?>  redisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     @BeforeEach
     void clearCache() {
         redisTemplate.getConnectionFactory().getConnection().commands().flushAll();
+    }
+
+    @Test
+    @DisplayName("Init Test")
+    public void initTest() {
+        assertThat(this.service).isInstanceOf(UrlService.class);
+        assertThat(AopUtils.isAopProxy(this.service)).isTrue();
     }
 
     @Test
@@ -78,26 +83,23 @@ public class UrlServiceTest {
         assertThat(res).isNotNull().isEqualTo(longUrl);
     }
 
-    //  TODO: Transaction method should be called by extern obj
-    /*
     @Test
     @DisplayName("Concurrency Test")
     public void concurrencyCreateTest() throws InterruptedException, ExecutionException {
         //  given
         String  longUrl = "https://www.same.url";
-        ExecutorService executor = Executors.newFixedThreadPool(10);
+        ExecutorService executor = Executors.newFixedThreadPool(100);
 
-        List<Future<String>>    jobs = new ArrayList<>(10);
-        List<String>            res = new ArrayList<>(10);
+        List<Future<String>>    jobs = new ArrayList<>(100);
+        Set<String> res = Collections.synchronizedSet(new HashSet<>());
+
         //  when
-        for (int i = 0; i < 10; i++)
-            jobs.add(executor.submit(() -> service.getShortUrl(longUrl)));
+        for (int i = 0; i < 100; i++) jobs.add(executor.submit(
+                () -> service.getShortUrl(longUrl)));
         for (Future<String> job : jobs) res.add(job.get());
         executor.shutdown();
+
         //  then
-        boolean isSame = res.stream().allMatch(url -> url.equals(res.get(0)));
-        //  True가 되어야함
-        //assertThat(isSame).isFalse();
+        assertThat(res.size()).isEqualTo(1);
     }
-    */
 }
