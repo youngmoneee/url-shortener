@@ -6,6 +6,7 @@ import app.youngmon.surl.interfaces.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,16 +26,13 @@ public class UrlServiceImpl implements UrlService {
     }
 
     @Override
+    @Retryable(retryFor = DataIntegrityViolationException.class)
     public String
     getShortUrl(String longUrl) {
-        UrlEntity   url;
-        try {
-            url = this.db.findUrlEntityByLongUrl(longUrl).orElseGet(
-                    () -> this.db.save(new UrlEntity(longUrl)));;
-        } catch (DataIntegrityViolationException e) {
-            url = this.db.findUrlEntityByLongUrl(longUrl).get();
-            if (url.getShortUrl() != null) return url.getShortUrl();
-        }
+        //  Retry if Duplicated
+        UrlEntity   url = this.db.findUrlEntityByLongUrl(longUrl).orElseGet(
+                () -> this.db.save(new UrlEntity(longUrl)));
+
         if (url.getShortUrl() != null) return url.getShortUrl();
         url.setShortUrl(this.generator.encode(url.getId()));
         this.db.save(url);
