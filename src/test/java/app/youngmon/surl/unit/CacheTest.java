@@ -1,6 +1,6 @@
 package app.youngmon.surl.unit;
 
-import app.youngmon.surl.interfaces.CacheRepository;
+import app.youngmon.surl.cache.CacheRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
