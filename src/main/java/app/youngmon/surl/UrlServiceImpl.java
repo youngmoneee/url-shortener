@@ -1,5 +1,6 @@
 package app.youngmon.surl;
 
+import app.youngmon.surl.cache.Cacheable;
 import app.youngmon.surl.datas.UrlEntity;
 import app.youngmon.surl.exception.NotFoundException;
 import app.youngmon.surl.interfaces.*;
@@ -14,14 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UrlServiceImpl implements UrlService {
     private final DbRepository      db;
-    private final CacheRepository   cache;
     private final Generator         generator;
 
     @Autowired
-    UrlServiceImpl(DbRepository db, CacheRepository cache, Generator generator)
+    UrlServiceImpl(DbRepository db, Generator generator)
     {
         this.db = db;
-        this.cache = cache;
         this.generator = generator;
     }
 
@@ -41,21 +40,13 @@ public class UrlServiceImpl implements UrlService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable
     public String
     getLongUrl(String shortUrl) {
-        //  Cache Hit
-        String url = this.cache.get(shortUrl);
-        if (url != null) return url;
-
-        //  Else
         Long    id = this.generator.decode(shortUrl);
-        url = this.db.findById(id)
+
+        return this.db.findById(id)
                 .map(UrlEntity::getLongUrl)
                 .orElseThrow(()-> new NotFoundException("Not Found Url"));
-
-        //  Register
-        this.cache.set(shortUrl, url);
-        log.debug("Registry {} : {}", shortUrl, url);
-        return url;
     }
 }
