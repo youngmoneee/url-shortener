@@ -39,11 +39,11 @@ jobs:
       uses: google-github-actions/setup-gcloud@v1
 
     #  Cloud Build -> Docker
-    - name: Build and Push Docker image
-      run: | 
-        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }} .
-        gcloud auth configure-docker
-        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}
+    #- name: Build and Push Docker image
+    #  run: | 
+    #    docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }} .
+    #    gcloud auth configure-docker
+    #    docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_IMAGE_NAME }}
     
     ##     
     #- name: Deploy to Cloud Run
