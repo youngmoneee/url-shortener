@@ -59,4 +59,4 @@ hs_err_pid*
 replay_pid*
 
 # private
-*.yml
+application*.yml

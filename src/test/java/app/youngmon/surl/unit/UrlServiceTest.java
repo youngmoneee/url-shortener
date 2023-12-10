@@ -1,7 +1,7 @@
 package app.youngmon.surl.unit;
 
 import app.youngmon.surl.datas.UrlEntity;
-import app.youngmon.surl.interfaces.CacheRepository;
+import app.youngmon.surl.cache.CacheRepository;
 import app.youngmon.surl.interfaces.DbRepository;
 import app.youngmon.surl.interfaces.Generator;
 import app.youngmon.surl.interfaces.UrlService;
