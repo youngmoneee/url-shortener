@@ -20,6 +20,11 @@ data:
       multiline.parser  docker
 
     [INPUT]
+      name    dummy
+      tag     dummy.log
+      dummy   {"log":"2023-12-14T14:07:17.708Z  INFO 1 --- [nio-8080-exec-2] app.youngmon.surl.UrlController          : https://google.com\n","stream":"stdout","time":"2023-12-14T14:07:17.708511464Z"}
+
+    [INPUT]
       name    tail
       tag     db.log
       path    /var/log/containers/mariadb*.log
@@ -42,11 +47,9 @@ data:
       name  stdout
       match *
       format  json_lines
-      json_date_key false
 
-      # 2023-12-14T13:22:58.778Z INFO 1 --- [nio-8080-exec-1] app.youngmon.surl.UrlController : https://google.com\n"
   parsers.conf: |
     [PARSER]
       Name        spring_log
       Format      regex        
-      Regex       ^(?<time>\d{4}-\d{2}-\d{2}T\d{2}:\d{3}:\d{2}.\d{3}Z)\s+(?<level>\w+)\s+\d*\s+---\s+\[(?<thread>.*)\]\s+(?<logger>[^\s].*?[^\s])\s+:\s+(?<message>.*)
+      Regex       ^(?<date>\d{4}-\d{2}-\d{2})T(?<time>\d{2}:\d{2}:\d{2}.\d{3})Z\s+(?<level>\w+)\s+(?<pid>\d+)\s+---\s+\[(?<thread>[^\]]+)]\s+(?<logger>[^\s]+)\s+:\s+(?<message>.*)$
