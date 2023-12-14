@@ -22,35 +22,22 @@ spec:
             cpu: 10m
             memory: 10Mi
         volumeMounts:
-        - name: varlog
+        - name: symlog
           mountPath: /var/log
           readOnly: true
-        - name: varlogcontainers
-          mountPath: /var/log/containers
+        - name : reallog
+          mountPath: /var/lib/docker/containers
           readOnly: true
-        - name: mnt
-          mountPath: /mnt
         - name: fluent-bit-config
           mountPath: /fluent-bit/etc
-        - name: varlogpods
-          mountPath: /var/log/pods
       terminationGracePeriodSeconds: 10
       volumes:
-      - name: varlog
+      - name: symlog
         hostPath:
           path: /var/log
-          type: ""
-      - name: varlogcontainers
+      - name: reallog
         hostPath:
-          path: /var/log/containers
-          type: ""
-      - name: varlogpods
-        hostPath:
-          path: /var/log/pods
-          type: ""
-      - name: mnt
-        hostPath:
-          path: /mnt
+          path: /var/lib/docker/containers
       - name: fluent-bit-config
         configMap:
           name: fluent-bit-conf
