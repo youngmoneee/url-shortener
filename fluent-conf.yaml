@@ -7,49 +7,66 @@ metadata:
 data:
   fluent-bit.conf: |
     [SERVICE]
-      flush   5
       daemon  off
       log_level info
-      parsers_file parsers.conf
+      parsers_file custom_parser.conf
 
     [INPUT]
       name    tail
-      tag     app.log
+      tag     log.surl
       path    /var/log/containers/surl*.log
-      parser  json
-      multiline.parser  docker
-
-    [INPUT]
-      name    dummy
-      tag     dummy.log
-      dummy   {"log":"2023-12-14T14:07:17.708Z  INFO 1 --- [nio-8080-exec-2] app.youngmon.surl.UrlController          : https://google.com\n","stream":"stdout","time":"2023-12-14T14:07:17.708511464Z"}
+      parser  docker
 
     [INPUT]
       name    tail
-      tag     db.log
+      tag     log.db
       path    /var/log/containers/mariadb*.log
       parser  docker
-      multiline.parser  docker
+    
+    [INPUT]
+      name    mem
+      tag     metric.mem
+
+    [INPUT]
+      name    cpu
+      tag     metric.cpu
     
     [FILTER]
       name   parser
-      match  app.log
+      match  log.surl
       key_name  log
       parser  spring_log
-      
+    
     [FILTER]
-      name  parser
-      match   dummy.log
-      key_name  log
-      parser  spring_log
+      name    modify
+      match   metric.mem
+      remove_wildcard Swap
+      rename  Mem.used Used
+      rename  Mem.free Available
+      rename  Mem.total Total
+
+    [FILTER]
+      name    modify
+      match   metric.cpu
+      remove_regex  ^cpu\d+\.
+      rename  cpu_p     CPUs
+      rename  user_p    USR
+      rename  system_p  SYS
     
     [OUTPUT]
       name  stdout
       match *
-      format  json_lines
+      json_date_key false
+      #format  json_lines
 
-  parsers.conf: |
+  custom_parser.conf: |
     [PARSER]
-      Name        spring_log
-      Format      regex        
-      Regex       ^(?<date>\d{4}-\d{2}-\d{2})T(?<time>\d{2}:\d{2}:\d{2}.\d{3})Z\s+(?<level>\w+)\s+(?<pid>\d+)\s+---\s+\[(?<thread>[^\]]+)]\s+(?<logger>[^\s]+)\s+:\s+(?<message>.*)$
+      name        docker
+      format      json
+      tag         *
+
+    [PARSER]
+      name        spring_log
+      format      regex
+      tag         *
+      regex       ^(?<date>\d{4}-\d{2}-\d{2})T(?<time>\d{2}:\d{2}:\d{2}.\d{3})Z\s+(?<level>\w+)\s+(?<pid>\d+)\s+---\s+\[(?<thread>[^\]]+)]\s+(?<logger>[^\s]+)\s+:\s+(?<message>.*)$
