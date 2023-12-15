@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: log-collector
+spec:
+  selector:
+    matchLabels:
+      name: fluentbit
+  template:
+    metadata:
+      labels:
+        name: fluentbit
+    spec:
+      containers:
+      - name: fluentbit-container
+        image: fluent/fluent-bit
+        resources:
+          limits:
+            cpu: 50m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        volumeMounts:
+        - name: symlog
+          mountPath: /var/log
+          readOnly: true
+        - name : reallog
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+        - name: fluent-bit-config
+          mountPath: /fluent-bit/etc
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: symlog
+        hostPath:
+          path: /var/log
+      - name: reallog
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: fluent-bit-config
+        configMap:
+          name: fluent-bit-conf
