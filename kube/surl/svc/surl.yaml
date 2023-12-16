@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: surl
+spec:
+  type: NodePort
+  selector:
+    app: surl
+  ports:
+    - port: 8080
+      targetPort: 8080

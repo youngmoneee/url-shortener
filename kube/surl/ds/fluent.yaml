@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: log-collector
+  name: fluentbit
+  namespace: surl
 spec:
   selector:
     matchLabels:
@@ -40,4 +41,4 @@ spec:
           path: /var/lib/docker/containers
       - name: fluent-bit-config
         configMap:
-          name: fluent-bit-conf
+          name: fluentbit

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mariadb
+  namespace: surl
   labels:
     app: mariadb
 spec:
@@ -21,17 +22,4 @@ spec:
           - containerPort: 3306
         envFrom:
           - configMapRef:
-              name: db-conf
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: database
-spec:
-  type: ClusterIP
-  selector:
-    app: mariadb
-  ports:
-    - protocol: TCP
-      port: 3306
-      targetPort: 3306
+              name: mariadb-env

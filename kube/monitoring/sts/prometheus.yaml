@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: prom-server
+  name: prometheus
+  namespace: monitoring
   labels:
     app: prometheus
 spec:
@@ -17,10 +18,10 @@ spec:
       volumes:
       - name: vol
         persistentVolumeClaim:
-          claimName: prom-vol
+          claimName: prometheus
       - name: prom-conf
         configMap:
-          name: promconf
+          name: prometheus
       containers:
       - name: prometheus
         image: prom/prometheus
