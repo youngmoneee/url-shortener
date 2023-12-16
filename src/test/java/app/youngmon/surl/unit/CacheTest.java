@@ -1,5 +1,7 @@
 package app.youngmon.surl.unit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import app.youngmon.surl.cache.CacheRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,64 +13,64 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Url Cache Test")
 @SpringBootTest
 @Testcontainers
 public class CacheTest {
-    @Container
-    private static final GenericContainer<?>    redis =
-            new GenericContainer<>("redis:latest").withExposedPorts(6379);
-    @Autowired
-    private CacheRepository               cache;
 
-    @DynamicPropertySource
-    static void redisProperty(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.redis.host", redis::getHost);
-        registry.add("spring.data.redis.port", redis::getFirstMappedPort);
-    }
+  @Container
+  private static final GenericContainer<?> redis =
+      new GenericContainer<>("redis:latest").withExposedPorts(6379);
+  @Autowired
+  private CacheRepository cache;
 
-    @Test
-    @DisplayName("Cache Set Test")
-    void    setTest() {
-        //  given
-        String  key = "key";
-        String  value = "value";
+  @DynamicPropertySource
+  static void redisProperty(DynamicPropertyRegistry registry) {
+    registry.add("spring.data.redis.host", redis::getHost);
+    registry.add("spring.data.redis.port", redis::getFirstMappedPort);
+  }
 
-        //  when
-        String  res = cache.set(key, value);
+  @Test
+  @DisplayName("Cache Set Test")
+  void setTest() {
+    //  given
+    String key = "key";
+    String value = "value";
 
-        //  then
-        assertThat(res).isEqualTo(value);
-    }
+    //  when
+    String res = cache.set(key, value);
 
-    @Test
-    @DisplayName("Cache Hit Test")
-    void    cacheHitTest() {
-        //  given
-        String  longUrl = "https://ymon.io";
-        String  expectedUrl = "expectedUrl";
+    //  then
+    assertThat(res).isEqualTo(value);
+  }
 
-        cache.set(longUrl, expectedUrl);
+  @Test
+  @DisplayName("Cache Hit Test")
+  void cacheHitTest() {
+    //  given
+    String longUrl = "https://ymon.io";
+    String expectedUrl = "expectedUrl";
 
-        //  when
-        String  res = cache.get(longUrl);
+    cache.set(longUrl, expectedUrl);
 
-        //  then
-        assertThat(res).isEqualTo(expectedUrl);
-    }
+    //  when
+    String res = cache.get(longUrl);
 
-    @Test
-    @DisplayName("Cache Miss Test")
-    void    cacheMissTest() {
-        //  given
-        String  longUrl = "https://no-url.com";
+    //  then
+    assertThat(res).isEqualTo(expectedUrl);
+  }
 
-        //  when
-        String  res = cache.get(longUrl);
+  @Test
+  @DisplayName("Cache Miss Test")
+  void cacheMissTest() {
+    //  given
+    String longUrl = "https://no-url.com";
 
-        //  then
-        assertThat(res).isEqualTo(null);
-    }
+    //  when
+    String res = cache.get(longUrl);
+
+    //  then
+    assertThat(res).isEqualTo(null);
+  }
 }
