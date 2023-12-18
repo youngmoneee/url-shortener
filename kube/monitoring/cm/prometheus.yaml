@@ -6,6 +6,13 @@ metadata:
 data:
   prometheus.yaml: |
     global:
-      scrape_interval: 15s
       scrape_timeout: 10s
-      evaluation_interval: 15s
+      scrape_interval: 15s
+      evaluation_interval: 1m
+    scrape_configs:
+      - job_name: surl-scrape
+        kubernetes_sd_configs:
+          - role: pod
+          selectors:
+            - role: pod
+              label: 'name=fluentbit'
