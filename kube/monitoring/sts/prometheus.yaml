@@ -31,4 +31,4 @@ spec:
           - name: vol
             mountPath: /var/lib/prometheus
           - name: prom-conf
-            mountPath: /etc/prometheus/conf
+            mountPath: /etc/prometheus
