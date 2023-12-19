@@ -15,6 +15,8 @@ spec:
       containers:
       - name: fluentbit-container
         image: fluent/fluent-bit
+        ports:
+          - containerPort: 2021
         resources:
           limits:
             cpu: 50m
@@ -42,3 +44,16 @@ spec:
       - name: fluent-bit-config
         configMap:
           name: fluentbit
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluent-bit
+  namespace: surl
+spec:
+  type: NodePort
+  selector:
+    name: fluentbit
+  ports:
+    - port: 2021
+      targetPort: 2021
