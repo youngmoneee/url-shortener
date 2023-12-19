@@ -11,6 +11,9 @@ data:
       daemon  off
       log_level info
       parsers_file custom_parser.conf
+      http_server  On
+      http_listen  0.0.0.0
+      http_port    2021
 
     [INPUT]
       name    tail
@@ -27,10 +30,17 @@ data:
     [INPUT]
       name    mem
       tag     metric.mem
+      alias   memory
 
     [INPUT]
       name    cpu
       tag     metric.cpu
+      alias   cpu
+
+    [INPUT]
+      name    node_exporter_metrics
+      tag     ne
+      alias   node
     
     [FILTER]
       name   parser
@@ -62,7 +72,7 @@ data:
 
     [OUTPUT]
       name  prometheus_exporter
-      match metric.*
+      match ne
       host  0.0.0.0
       port  2021
 
