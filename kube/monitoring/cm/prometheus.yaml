@@ -10,16 +10,41 @@ data:
       scrape_interval: 15s
       evaluation_interval: 1m
     scrape_configs:
-      - job_name: surl-scrape
+      - job_name: kube-apiserver
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        authorization:
+          credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         kubernetes_sd_configs:
-          - role: pod
-            selectors:
-            - role: pod
-              label: 'name=fluentbit'
+          - role: endpoints
         relabel_configs:
-          - source_labels: [__address__, __meta_kubernetes_pod_container_port_number]
-            action: replace
-            target_label: __address__
-            regex: ([^:]+)(?::\d+)?;(\d+)
-            replacement: $1:$2
-              #metrics_path: '/api/v2/metrics/prometheus'
+          - source_labels: [
+            __meta_kubernetes_namespace,
+            __meta_kubernetes_service_name,
+            __meta_kubernetes_endpoint_port_name,
+          ]
+            action: keep
+            regex: default;kubernetes;https
+
+      - job_name: kube_node
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        authorization:
+          credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+        kubernetes_sd_configs:
+          - role: node
+        relabel_configs:
+          - action: labelmap
+            # 노드 레이블 -> 프로메테우스 레이블
+            regex: __meta_kubernetes_node_label_(.+)
+          - target_label: __address__
+            # K8s Api Server
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            # Kubelet Metric Path
+            replacement: /api/v1/nodes/${1}/proxy/metrics
