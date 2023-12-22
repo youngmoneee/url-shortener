@@ -38,13 +38,28 @@ data:
           - role: node
         relabel_configs:
           - action: labelmap
-            # 노드 레이블 -> 프로메테우스 레이블
             regex: __meta_kubernetes_node_label_(.+)
           - target_label: __address__
-            # K8s Api Server
             replacement: kubernetes.default.svc:443
           - source_labels: [__meta_kubernetes_node_name]
             regex: (.+)
             target_label: __metrics_path__
-            # Kubelet Metric Path
             replacement: /api/v1/nodes/${1}/proxy/metrics
+      
+      - job_name: kube_pods
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        authorization:
+          credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+          - role: node
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor

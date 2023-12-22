@@ -5,5 +5,13 @@ metadata:
 rules:
   - apiGroups: [""]
     resources:
-      - pods
+      - nodes
+      - nodes/metrics
+      - nodes/proxy
+      - services
+      - endpoints
     verbs: ["get", "list", "watch"]
+  - nonResourceURLs:
+    - "/metrics"
+    verbs:
+      - get
