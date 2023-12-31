@@ -1,17 +1,19 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: service-discovery
+  name: scrape
 rules:
-  - apiGroups: [""]
-    resources:
-      - nodes
-      - nodes/metrics
-      - nodes/proxy
-      - services
-      - endpoints
-    verbs: ["get", "list", "watch"]
   - nonResourceURLs:
-    - "/metrics"
+    - /metrics
     verbs:
       - get
+  - apiGroups:
+    - ""
+    resources:
+    - services
+    - pods
+    - endpoints
+    verbs:
+    - get
+    - list
+    - watch

@@ -1,39 +1,11 @@
-apiVersion: apps/v1
-kind: StatefulSet
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
 metadata:
-  name: prometheus
-  namespace: monitoring
-  labels:
-    app: prometheus
+ labels:
+   app: prom-server
+ name: server
+ namespace: monitoring
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: prometheus
-  template:
-    metadata:
-      labels:
-        app: prometheus
-    spec:
-      serviceAccountName: prometheus
-      volumes:
-      - name: vol
-        persistentVolumeClaim:
-          claimName: prometheus
-      - name: prom-conf
-        configMap:
-          name: prometheus
-      containers:
-      - name: prometheus
-        image: prom/prometheus
-        args:
-          - "--config.file=/etc/prometheus/prometheus.yml"
-          - "--log.level=debug"
-          - "--web.enable-lifecycle"
-        ports:
-          - containerPort: 9090
-        volumeMounts:
-          - name: vol
-            mountPath: /var/lib/prometheus
-          - name: prom-conf
-            mountPath: /etc/prometheus
+ baseImage: prom/prometheus
+ replicas: 2
+ serviceAccountName: prom-server
