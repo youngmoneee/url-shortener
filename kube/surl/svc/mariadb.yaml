@@ -3,11 +3,14 @@ kind: Service
 metadata:
   name: database
   namespace: surl
+  labels:
+    app: database
 spec:
   type: ClusterIP
   selector:
     app: mariadb
   ports:
-    - protocol: TCP
+    - name: main
+      protocol: TCP
       port: 3306
       targetPort: 3306

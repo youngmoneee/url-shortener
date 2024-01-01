@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app: mariadb
+      annotations:
+        prometheus.io/scrape: 'true'
     spec:
       containers:
       - name: db-container

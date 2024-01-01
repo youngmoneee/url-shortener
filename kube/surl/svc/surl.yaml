@@ -3,10 +3,15 @@ kind: Service
 metadata:
   name: backend
   namespace: surl
+  labels:
+    app: surl
+  annotations:
+    prometheus.io/scrape: "true"
 spec:
   type: NodePort
   selector:
     app: surl
   ports:
-    - port: 8080
+    - name: main
+      port: 8080
       targetPort: 8080
