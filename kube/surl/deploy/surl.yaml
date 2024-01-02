@@ -24,6 +24,7 @@ spec:
         imagePullPolicy: Never
         ports:
           - containerPort: 8080
+          - containerPort: 9100
         envFrom:
           - configMapRef:
               name: backend-env
