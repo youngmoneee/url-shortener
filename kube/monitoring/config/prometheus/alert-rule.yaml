@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: surl
+  namespace: monitoring
+  labels:
+    prometheus: alert-rule
+spec:
+  groups:
+    - name: network
+      rules:
+        - alert: TooManyRequest
+          expr: increase(http_server_requests_seconds_count[15s]) > 150
+          for: 2s
+          labels:
+            level: warning
+          annotations:
+            summary: High HTTP requests per pod
+            description: "Each pod is handling more than 100 requests in 15 seconds."
+        - alert: TooLongLatency
+          expr: http_server_requests_seconds_max > 1
+          labels:
+            level: warning
+          annotations:
+            summary: Too Long Latency
+            description: "Response Pending Time is over than 1s"

@@ -9,6 +9,9 @@ spec:
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
   ruleNamespaceSelector: {}
+  ruleSelector:
+    matchLabels:
+      prometheus: alert-rule
   image: prom/prometheus
   replicas: 2
   serviceAccountName: prom-server
