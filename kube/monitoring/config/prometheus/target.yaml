@@ -14,25 +14,26 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: surl
+  name: baekend
   namespace: surl
 spec:
   selector:
     matchLabels:
-      app: surl
+      metrics: surl
   endpoints:
-    - port: main
-      interval: 15s
+    - port: metrics
+      interval: 3s
+      path: /actuator/prometheus
 ---
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: database
-  namespace: surl
-spec:
-  selector:
-    matchLabels:
-      app: database
-  endpoints:
-    - port: main
-      interval: 15s
+#apiVersion: monitoring.coreos.com/v1
+#kind: ServiceMonitor
+#metadata:
+#  name: database
+#  namespace: surl
+#spec:
+#  selector:
+#    matchLabels:
+#      app: database
+#  endpoints:
+#    - port: main
+#       interval: 15s

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: fluentbit
-  namespace: surl
+  namespace: monitoring
   labels:
     app: fluentbit
 data:
@@ -27,54 +27,16 @@ data:
       path    /var/log/containers/mariadb*.log
       parser  docker
     
-    [INPUT]
-      name    mem
-      tag     metric.mem
-      alias   memory
-
-    [INPUT]
-      name    cpu
-      tag     metric.cpu
-      alias   cpu
-
-    [INPUT]
-      name    node_exporter_metrics
-      tag     ne
-      alias   node
-    
     [FILTER]
       name   parser
       match  log.surl
       key_name  log
       parser  spring_log
     
-    [FILTER]
-      name    modify
-      match   metric.mem
-      remove_wildcard Swap
-      rename  Mem.used Used
-      rename  Mem.free Available
-      rename  Mem.total Total
-
-    [FILTER]
-      name    modify
-      match   metric.cpu
-      remove_regex  ^cpu\d+\.
-      rename  cpu_p     CPUs
-      rename  user_p    USR
-      rename  system_p  SYS
-    
     [OUTPUT]
       name  stdout
       match *
       json_date_key false
-      #format  json_lines
-
-    [OUTPUT]
-      name  prometheus_exporter
-      match ne
-      host  0.0.0.0
-      port  2021
 
   custom_parser.conf: |
     [PARSER]
