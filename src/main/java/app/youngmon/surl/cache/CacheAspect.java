@@ -14,36 +14,42 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @ConditionalOnProperty(name = "spring.cache", havingValue = "true")
 public class CacheAspect {
-	final private CacheRepository cache;
 
-	@Autowired
-	CacheAspect(CacheRepository cache) { this.cache = cache;}
-	@Around("@annotation(Cacheable)")
-	public Object cache(ProceedingJoinPoint jp, Cacheable Cacheable) throws Throwable {
-		String  arg = (String) jp.getArgs()[0];
-		String  res;
-		try {
-			res = this.cache.get(arg);
+  private final CacheRepository cache;
 
-			//  Cache Hit
-			if (res != null) return res;
-		} catch (RedisException e) {
-			log.debug("Cache Get Failed: " + e.getMessage());
-		} catch (RuntimeException e) {
-			log.debug("Cache Access Failed: " + e.getMessage());
-		}
+  @Autowired
+  CacheAspect(CacheRepository cache) {
+    this.cache = cache;
+  }
 
-		//  Find DB If Cache Miss
-		res = (String)jp.proceed();
+  @Around("@annotation(cacheable)")
+  public Object cache(ProceedingJoinPoint jp, Cacheable cacheable) throws Throwable {
+    String arg = (String) jp.getArgs()[0];
+    String res;
+    try {
+      res = this.cache.get(arg);
 
-		//  And Registry
-		try {
-			this.cache.set(arg, res, Cacheable.expire());
-		} catch (RedisException e) {
-			log.debug("Cache Update Failed: " + e.getMessage());
-		} catch (RuntimeException e) {
-			log.debug("Cache Access Failed: " + e.getMessage());
-		}
-		return res;
-	}
+      //  Cache Hit
+      if (res != null) {
+        return res;
+      }
+    } catch (RedisException e) {
+      log.debug("Cache Get Failed: " + e.getMessage());
+    } catch (RuntimeException e) {
+      log.debug("Cache Access Failed: " + e.getMessage());
+    }
+
+    //  Find DB If Cache Miss
+    res = (String) jp.proceed();
+
+    //  And Registry
+    try {
+      this.cache.set(arg, res, cacheable.expire());
+    } catch (RedisException e) {
+      log.debug("Cache Update Failed: " + e.getMessage());
+    } catch (RuntimeException e) {
+      log.debug("Cache Access Failed: " + e.getMessage());
+    }
+    return res;
+  }
 }

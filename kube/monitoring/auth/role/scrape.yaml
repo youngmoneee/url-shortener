@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: scrape
+rules:
+  - nonResourceURLs:
+    - /metrics
+    verbs:
+      - get
+  - apiGroups:
+    - ""
+    resources:
+    - services
+    - pods
+    - endpoints
+    verbs:
+    - get
+    - list
+    - watch

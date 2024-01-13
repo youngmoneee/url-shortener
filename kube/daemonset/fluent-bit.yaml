@@ -1,15 +1,19 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: fluent-bit-conf
+  name: fluentbit
+  namespace: monitoring
   labels:
-    k8s-app: fluent-bit
+    app: fluentbit
 data:
   fluent-bit.conf: |
     [SERVICE]
       daemon  off
       log_level info
       parsers_file custom_parser.conf
+      http_server  On
+      http_listen  0.0.0.0
+      http_port    2021
 
     [INPUT]
       name    tail
@@ -23,41 +27,16 @@ data:
       path    /var/log/containers/mariadb*.log
       parser  docker
     
-    [INPUT]
-      name    mem
-      tag     metric.mem
-
-    [INPUT]
-      name    cpu
-      tag     metric.cpu
-    
     [FILTER]
       name   parser
       match  log.surl
       key_name  log
       parser  spring_log
     
-    [FILTER]
-      name    modify
-      match   metric.mem
-      remove_wildcard Swap
-      rename  Mem.used Used
-      rename  Mem.free Available
-      rename  Mem.total Total
-
-    [FILTER]
-      name    modify
-      match   metric.cpu
-      remove_regex  ^cpu\d+\.
-      rename  cpu_p     CPUs
-      rename  user_p    USR
-      rename  system_p  SYS
-    
     [OUTPUT]
       name  stdout
       match *
       json_date_key false
-      #format  json_lines
 
   custom_parser.conf: |
     [PARSER]

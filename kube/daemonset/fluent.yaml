@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: log-collector
+  name: fluentbit
+  namespace: monitoring
 spec:
   selector:
     matchLabels:
@@ -14,6 +15,8 @@ spec:
       containers:
       - name: fluentbit-container
         image: fluent/fluent-bit
+        ports:
+          - containerPort: 2021
         resources:
           limits:
             cpu: 50m
@@ -40,4 +43,17 @@ spec:
           path: /var/lib/docker/containers
       - name: fluent-bit-config
         configMap:
-          name: fluent-bit-conf
+          name: fluentbit
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluent-bit
+  namespace: monitoring
+spec:
+  type: NodePort
+  selector:
+    name: fluentbit
+  ports:
+    - port: 2021
+      targetPort: 2021

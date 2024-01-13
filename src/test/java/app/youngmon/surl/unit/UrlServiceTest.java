@@ -1,10 +1,14 @@
 package app.youngmon.surl.unit;
 
-import app.youngmon.surl.datas.UrlEntity;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import app.youngmon.surl.cache.CacheRepository;
+import app.youngmon.surl.datas.UrlEntity;
 import app.youngmon.surl.interfaces.DbRepository;
 import app.youngmon.surl.interfaces.Generator;
 import app.youngmon.surl.interfaces.UrlService;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,84 +18,82 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UrlService Test")
 @SpringBootTest
 @Transactional
 public class UrlServiceTest {
-    @MockBean
-    private DbRepository db;
-    @MockBean
-    private CacheRepository cache;
-    @MockBean
-    private Generator generator;
-    @Autowired
-    private UrlService service;
 
-    @Test
-    @DisplayName("Get Short Url Test")
-    void getShortUrlTest() {
-        //  given
-        String  longUrl = "longUrl";
-        String  shortUrl = "shortUrl";
-        UrlEntity expectedUrlEntity = new UrlEntity(longUrl);
-        expectedUrlEntity.setShortUrl(shortUrl);
+  @MockBean
+  private DbRepository db;
+  @MockBean
+  private CacheRepository cache;
+  @MockBean
+  private Generator generator;
+  @Autowired
+  private UrlService service;
 
-        when(db.findUrlEntityByLongUrl(longUrl)).thenReturn(Optional.of(expectedUrlEntity));
+  @Test
+  @DisplayName("Get Short Url Test")
+  void getShortUrlTest() {
+    //  given
+    String longUrl = "longUrl";
+    String shortUrl = "shortUrl";
+    UrlEntity expectedUrlEntity = new UrlEntity(longUrl);
+    expectedUrlEntity.setShortUrl(shortUrl);
 
-        //  when
-        String  res = service.getShortUrl(longUrl);
+    when(db.findUrlEntityByLongUrl(longUrl)).thenReturn(Optional.of(expectedUrlEntity));
 
-        //  then
-        assertThat(res).isEqualTo(shortUrl);
-    }
+    //  when
+    String res = service.getShortUrl(longUrl);
 
-    @Test
-    @DisplayName("Get Long Url Test::Cached")
-    void getCachedLongUrlTest() {
-        //  given
-        String  shortUrl = "shortUrl";
-        String  cacheHit = "cache-hit";
-        String  cacheMiss = "cache-miss";
-        UrlEntity urlEntity = new UrlEntity(cacheMiss);
-        urlEntity.setId(1L);
+    //  then
+    assertThat(res).isEqualTo(shortUrl);
+  }
 
-        when(cache.get(shortUrl)).thenReturn(cacheHit);
+  @Test
+  @DisplayName("Get Long Url Test::Cached")
+  void getCachedLongUrlTest() {
+    //  given
+    String shortUrl = "shortUrl";
+    String cacheHit = "cache-hit";
+    String cacheMiss = "cache-miss";
+    UrlEntity urlEntity = new UrlEntity(cacheMiss);
+    urlEntity.setId(1L);
 
-        when(generator.decode(shortUrl)).thenReturn(1L);
-        when(db.findById(1L)).thenReturn(Optional.of(urlEntity));
+    when(cache.get(shortUrl)).thenReturn(cacheHit);
 
-        //  when
-        String  res = service.getLongUrl(shortUrl);
+    when(generator.decode(shortUrl)).thenReturn(1L);
+    when(db.findById(1L)).thenReturn(Optional.of(urlEntity));
 
-        //  then
-        assertThat(res).isEqualTo(cacheHit);
-    }
+    //  when
+    String res = service.getLongUrl(shortUrl);
 
-    @Test
-    @DisplayName("Get Long Url Test::No Cached")
-    void getLongUrlTest() {
-        //  given
-        String  shortUrl = "shortUrl";
-        String  cacheHit = "cache-hit";
-        String  cacheMiss = "cache-miss";
-        UrlEntity urlEntity = new UrlEntity(cacheMiss);
-        urlEntity.setId(1L);
+    //  then
+    assertThat(res).isEqualTo(cacheHit);
+  }
 
-        when(cache.get(shortUrl)).thenReturn(null);
+  @Test
+  @DisplayName("Get Long Url Test::No Cached")
+  void getLongUrlTest() {
+    //  given
+    String shortUrl = "shortUrl";
+    String cacheHit = "cache-hit";
+    String cacheMiss = "cache-miss";
+    UrlEntity urlEntity = new UrlEntity(cacheMiss);
+    urlEntity.setId(1L);
 
-        when(generator.decode(shortUrl)).thenReturn(1L);
-        when(db.findById(1L)).thenReturn(Optional.of(urlEntity));
+    when(cache.get(shortUrl)).thenReturn(null);
 
-        //  when
-        String  res = service.getLongUrl(shortUrl);
+    when(generator.decode(shortUrl)).thenReturn(1L);
+    when(db.findById(1L)).thenReturn(Optional.of(urlEntity));
 
-        //  then
-        assertThat(res).isEqualTo(cacheMiss);
-    }
+    //  when
+    String res = service.getLongUrl(shortUrl);
+
+    //  then
+    assertThat(res).isEqualTo(cacheMiss);
+  }
 }

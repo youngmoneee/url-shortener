@@ -7,7 +7,8 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableRetry
 @SpringBootApplication
 public class SurlApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(SurlApplication.class, args);
-	}
+
+  public static void main(String[] args) {
+    SpringApplication.run(SurlApplication.class, args);
+  }
 }
