@@ -11,3 +11,17 @@ spec:
     - port: metrics
       interval: 5s
       path: /actuator/prometheus
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: db-monitor
+  namespace: surl
+spec:
+  selector:
+    matchLabels:
+      metrics: db
+  endpoints:
+    - port: metrics
+      interval: 15s
+      path: /metrics
