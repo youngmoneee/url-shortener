@@ -11,8 +11,10 @@ plugins {
 jib {
 	allowInsecureRegistries true
     from.image = 'openjdk:17-jdk-slim'
-    to.image = 'surl'
-	to.tags = ['dev']
+    to {
+		image = 'gcr.io/future-depth-407105/surl'
+		tags = ['v0.1']
+	}
     container {
         ports = ['8080', '9100']
     }
@@ -48,7 +50,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'io.micrometer:micrometer-registry-prometheus:1.12.2'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'javax.validation:validation-api:2.0.1.Final'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
