@@ -6,7 +6,7 @@ metadata:
   labels:
     app: surl
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: surl
   ports:
@@ -26,5 +26,26 @@ spec:
     app: surl
   ports:
     - name: metrics
+      protocol: TCP
       port: 9100
       targetPort: 9100
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend
+  namespace: surl
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /*
+        backend:
+          service:
+            name: backend
+            port:
+              number: 8080
+        pathType: ImplementationSpecific
+    host: ss.ymon.io
+status:
+  loadBalancer: {}
