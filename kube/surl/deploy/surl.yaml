@@ -20,8 +20,7 @@ spec:
     spec:
       containers:
       - name: surl-container
-        image: surl
-        imagePullPolicy: Never
+        image: gcr.io/future-depth-407105/surl
         ports:
           - containerPort: 8080
           - containerPort: 9100
