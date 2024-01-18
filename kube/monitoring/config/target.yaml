@@ -4,6 +4,7 @@ metadata:
   name: surl-monitor
   namespace: surl
 spec:
+  jobLabel: surl
   selector:
     matchLabels:
       metrics: surl
@@ -18,6 +19,7 @@ metadata:
   name: db-monitor
   namespace: surl
 spec:
+  jobLabel: database
   selector:
     matchLabels:
       metrics: db
@@ -25,3 +27,16 @@ spec:
     - port: metrics
       interval: 15s
       path: /metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-state-metrics
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: exporter
+      app.kubernetes.io/name: kube-state-metrics
+  endpoints:
+    - port: http-metrics
