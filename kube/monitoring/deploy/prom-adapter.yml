@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: monitoring
+  name: prom-adapter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      prometheus: adapter
+  template:
+    metadata:
+      labels:
+        prometheus: adapter
+    spec:
+      serviceAccountName: prom-adapter
+      automountServiceAccountToken: true
+      containers:
+        - name: prom-adapter
+          image: directxman12/k8s-prometheus-adapter:v0.8.4
+          args:
+            - /adapter
+            - --cert-dir=/var/run/serving-cert
+            - --prometheus-url=http://prometheus-operated:9090/
+            - --secure-port=6443
+            - --logtostderr=true
+            - --config=/etc/adapter/config.yaml
+          ports:
+            - containerPort: 6443
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "50m"
+            limits:
+              memory: "200Mi"
+              cpu: "200m"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/adapter
+            - name: cert
+              mountPath: /var/run/serving-cert
+      volumes:
+        - name: config
+          configMap:
+            name: adapter-conf
+        - name: cert
+          emptyDir: {}
