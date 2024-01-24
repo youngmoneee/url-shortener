@@ -7,7 +7,7 @@ metadata:
     app: surl-hpa
 spec:
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 100
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
@@ -25,3 +25,10 @@ spec:
         target:
           type: Utilization
           averageUtilization: 40
+    - type: Pods
+      pods:
+        metric:
+          name: http_server_requests_per_second
+        target:
+          type: AverageValue
+          averageValue: 80

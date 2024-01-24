@@ -7,7 +7,6 @@ metadata:
   labels:
     app: surl
 spec:
-  replicas: 3
   selector:
     matchLabels:
       app: surl
