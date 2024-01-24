@@ -7,9 +7,9 @@ rules:
     - /metrics
     verbs:
       - get
-  - apiGroups:
-    - ""
+  - apiGroups: [""]
     resources:
+    - nodes
     - services
     - pods
     - endpoints
@@ -17,3 +17,8 @@ rules:
     - get
     - list
     - watch
+  - apiGroups: [""]
+    resources:
+      - get
+    verbs:
+      - configmaps
